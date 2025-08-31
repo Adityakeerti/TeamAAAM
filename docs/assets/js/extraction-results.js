@@ -40,8 +40,8 @@ class ExtractionResults {
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
             }, 2000);
-				return;
-			}
+            return;
+        }
     }
 
     // Setup event listeners
@@ -105,6 +105,148 @@ class ExtractionResults {
             userProfile.classList.toggle('active');
         }
     }
+    
+    // Show success banner when data is loaded
+    showSuccessBanner() {
+        const successBanner = document.getElementById('successBanner');
+        if (successBanner) {
+            successBanner.style.display = 'flex';
+            console.log('Success banner displayed');
+        }
+    }
+    
+    // Test method to manually populate form with sample data
+    testFormPopulation() {
+        const testData = {
+            "vessel_info": {
+                "name_of_vessel": "IOLCOS UNITY",
+                "name_of_master": "CAPT. RZHEVSKIY OLEG",
+                "agent": "GLOBAL MARITIME SERVICES LTD",
+                "port_of_loading_cargo": "UST-LUGA",
+                "port_of_discharge": "NEW YORK",
+                "description_of_cargo": "RUSSIAN STEAM COAL IN BULK",
+                "quantity_of_cargo": "72,106.029 MT"
+            }
+        };
+        
+        console.log('Testing form population with sample data:', testData);
+        
+        // First check if all form fields exist
+        console.log('=== Checking Form Fields ===');
+        const fieldIds = ['vessel-name', 'master', 'agent', 'port-loading', 'port-discharge', 'cargo', 'quantity'];
+        fieldIds.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                console.log(`✓ Found field: ${id}`);
+            } else {
+                console.log(`✗ Missing field: ${id}`);
+            }
+        });
+        console.log('=== End Form Field Check ===');
+        
+        this.renderFromBackendResult(testData);
+        
+        // Also try direct population to test
+        setTimeout(() => {
+            console.log('=== Direct Form Population Test ===');
+            const directMap = {
+                'vessel-name': 'IOLCOS UNITY',
+                'master': 'CAPT. RZHEVSKIY OLEG',
+                'agent': 'GLOBAL MARITIME SERVICES LTD',
+                'port-loading': 'UST-LUGA',
+                'port-discharge': 'NEW YORK',
+                'cargo': 'RUSSIAN STEAM COAL IN BULK',
+                'quantity': '72,106.029 MT'
+            };
+            
+            Object.keys(directMap).forEach((fieldId) => {
+                const element = document.getElementById(fieldId);
+                if (element) {
+                    element.value = directMap[fieldId];
+                    console.log(`Directly set ${fieldId} to: ${directMap[fieldId]}`);
+                }
+            });
+            console.log('=== End Direct Test ===');
+        }, 1000);
+        
+        // Also store this data in localStorage for testing
+        const localStorageData = {
+            "message": "PDF successfully converted to JSON",
+            "filename": "test_data.pdf",
+            "data": testData
+        };
+        localStorage.setItem('extractionResult', JSON.stringify(localStorageData));
+        console.log('Stored test data in localStorage');
+    }
+    
+    // Clear localStorage and reload page
+    clearAndReload() {
+        localStorage.removeItem('extractionResult');
+        console.log('Cleared localStorage and reloading page');
+        window.location.reload();
+    }
+    
+    // Debug localStorage contents
+    debugLocalStorage() {
+        console.log('=== localStorage Debug ===');
+        const raw = localStorage.getItem('extractionResult');
+        if (raw) {
+            try {
+                const parsed = JSON.parse(raw);
+                console.log('extractionResult in localStorage:', parsed);
+                console.log('Structure:', {
+                    hasData: !!parsed.data,
+                    hasVesselInfo: !!(parsed.data && parsed.data.vessel_info),
+                    hasEvents: !!(parsed.data && parsed.data.events),
+                    directVesselInfo: !!parsed.vessel_info,
+                    directEvents: !!parsed.events
+                });
+            } catch (e) {
+                console.error('Failed to parse localStorage data:', e);
+            }
+        } else {
+            console.log('No extractionResult in localStorage');
+        }
+        console.log('=== End localStorage Debug ===');
+    }
+    
+    // Show info message
+    showInfo(message) {
+        console.log('Info:', message);
+        // You can implement a proper info display here
+    }
+    
+    // Show error message
+    showError(message) {
+        console.error('Error:', message);
+        // You can implement a proper error display here
+    }
+    
+    // Show loading overlay
+    showLoading(message = 'Processing...') {
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingText = document.getElementById('loadingText');
+        if (loadingOverlay) {
+            loadingOverlay.style.display = 'flex';
+        }
+        if (loadingText) {
+            loadingText.textContent = message;
+        }
+    }
+    
+    // Hide loading overlay
+    hideLoading() {
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        if (loadingOverlay) {
+            loadingOverlay.style.display = 'none';
+        }
+    }
+    
+    // Show success message
+    showSuccess(message) {
+        console.log('Success:', message);
+        // You can implement a proper success display here
+    }
 
     // Close user menu
     closeUserMenu() {
@@ -121,18 +263,26 @@ class ExtractionResults {
     loadFromStoredResult() {
         const raw = localStorage.getItem('extractionResult');
         if (!raw) {
-            this.showError('No extraction result found. Please upload a PDF first.');
-            setTimeout(() => window.location.href = 'dashboard.html', 1200);
+            console.log('No extraction result found in localStorage');
+            // Don't redirect immediately, just show a message
+            this.showInfo('No extraction result found. Please upload a PDF or use the test button.');
             return;
         }
         try {
             const result = JSON.parse(raw);
+            console.log('Loaded result from localStorage:', result);
+            console.log('Result structure:', {
+                hasData: !!result.data,
+                hasVesselInfo: !!(result.data && result.data.vessel_info),
+                hasEvents: !!(result.data && result.data.events),
+                directVesselInfo: !!result.vessel_info,
+                directEvents: !!result.events
+            });
             this.renderFromBackendResult(result);
         } catch (e) {
             console.warn('Failed to parse extractionResult from localStorage:', raw);
             localStorage.removeItem('extractionResult');
             this.showError('Invalid result data. Please re-upload your PDF.');
-            setTimeout(() => window.location.href = 'dashboard.html', 1200);
         }
     }
 
@@ -189,9 +339,29 @@ class ExtractionResults {
     renderFromBackendResult(result) {
         console.log('Rendering backend result:', result);
         
-        const vessel = (result && result.vessel_info) || {};
+        // Extract vessel info from the correct path in the result structure
+        let vessel = {};
+        console.log('Result structure analysis:', {
+            hasResult: !!result,
+            hasData: !!(result && result.data),
+            hasVesselInfo: !!(result && result.data && result.data.vessel_info),
+            hasDirectVesselInfo: !!(result && result.vessel_info),
+            resultKeys: result ? Object.keys(result) : [],
+            dataKeys: result && result.data ? Object.keys(result.data) : []
+        });
+        
+        if (result && result.data && result.data.vessel_info) {
+            vessel = result.data.vessel_info;
+            console.log('Using vessel_info from result.data.vessel_info');
+        } else if (result && result.vessel_info) {
+            vessel = result.vessel_info;
+            console.log('Using vessel_info from result.vessel_info');
+        } else {
+            console.log('No vessel_info found in expected locations');
+        }
         console.log('Vessel info:', vessel);
         
+        // Map the backend fields to form input IDs
         const fieldMap = {
             'name_of_vessel': 'vessel-name',
             'name_of_master': 'master',
@@ -201,15 +371,76 @@ class ExtractionResults {
             'description_of_cargo': 'cargo',
             'quantity_of_cargo': 'quantity'
         };
-        Object.keys(fieldMap).forEach((k) => {
-            const el = document.getElementById(fieldMap[k]);
-            if (el) el.value = vessel[k] || '';
+        
+        // Also try alternative field names that might be used
+        const alternativeFieldMap = {
+            'vessel_name': 'vessel-name',
+            'master_name': 'master',
+            'port_loading': 'port-loading',
+            'port_discharge': 'port-discharge',
+            'cargo_description': 'cargo',
+            'cargo_quantity': 'quantity'
+        };
+        
+        // Populate form fields with extracted data using primary field map
+        Object.keys(fieldMap).forEach((key) => {
+            const formFieldId = fieldMap[key];
+            const formElement = document.getElementById(formFieldId);
+            if (formElement && vessel[key]) {
+                formElement.value = vessel[key];
+                console.log(`Populated ${formFieldId} with: ${vessel[key]}`);
+            } else if (formElement) {
+                console.log(`Field ${formFieldId} not found or no data for ${key}`);
+            }
         });
+        
+        // Try alternative field names if primary ones didn't work
+        Object.keys(alternativeFieldMap).forEach((key) => {
+            const formFieldId = alternativeFieldMap[key];
+            const formElement = document.getElementById(formFieldId);
+            if (formElement && vessel[key] && !formElement.value) {
+                formElement.value = vessel[key];
+                console.log(`Populated ${formFieldId} with alternative field ${key}: ${vessel[key]}`);
+            }
+        });
+        
+        // Debug: Check all form fields and their values
+        console.log('=== Form Field Debug ===');
+        Object.values(fieldMap).forEach((formFieldId) => {
+            const formElement = document.getElementById(formFieldId);
+            if (formElement) {
+                console.log(`${formFieldId}: "${formElement.value}"`);
+            } else {
+                console.log(`${formFieldId}: Element not found`);
+            }
+        });
+        console.log('=== End Form Field Debug ===');
+        
+        // Also check if any fields were actually populated
+        let populatedCount = 0;
+        Object.values(fieldMap).forEach((formFieldId) => {
+            const formElement = document.getElementById(formFieldId);
+            if (formElement && formElement.value) {
+                populatedCount++;
+            }
+        });
+        console.log(`Form population result: ${populatedCount} out of ${Object.keys(fieldMap).length} fields populated`);
+        
+        // Log all available vessel data for debugging
+        console.log('All available vessel data:', vessel);
+        console.log('Form field mapping:', fieldMap);
+        console.log('Vessel data keys:', Object.keys(vessel));
+        console.log('Vessel data values:', Object.values(vessel));
+        
+        // Show success banner if vessel data was loaded
+        if (Object.keys(vessel).length > 0) {
+            this.showSuccessBanner();
+        }
 
         // Calculator defaults - removed hardcoded values
         // Users should input their own values based on their contracts
 
-        // Try different possible data structures
+        // Try different possible data structures for events
         let backendEvents = [];
         if (Array.isArray(result && result.events)) {
             backendEvents = result.events;
@@ -241,14 +472,14 @@ class ExtractionResults {
             const endDateTime = startDate && endTime ? `${startDate} ${endTime}` : (startDate || endTime || '-');
             
             const mappedEvent = {
-                events: ev['Events'] || ev['Event Description'] || ev['Description'] || ev['event'] || '-',
-                day: ev['Day'] || ev['day'] || '-',
+                events: ev['Events'] || ev['Event Description'] || ev['Description'] || ev['event'] || '',
+                day: ev['Day'] || ev['day'] || '',
                 startDateTime: startDateTime,
                 endDateTime: endDateTime,
-                laytimeTimeUtilization: ev['Laytime Time Utilization'] || ev['laytime_time_utilization'] || ev['Duration'] || ev['duration'] || ev['laytime_utilization'] || '-',
-                laytimePercentageUtilization: ev['Laytime % Utilization'] || ev['laytime_percentage_utilization'] || ev['laytime_percentage'] || ev['percentage_utilization'] || '-',
-                laytimeConsumed: ev['Laytime Consumed'] || ev['laytime_consumed'] || ev['Duration'] || ev['duration'] || ev['laytime_used'] || '-',
-                laytimeRemaining: ev['Laytime Remaining'] || ev['laytime_remaining'] || ev['laytime_left'] || '-'
+                laytimeTimeUtilization: ev['Laytime Time Utilization'] || ev['laytime_time_utilization'] || ev['Duration'] || ev['duration'] || ev['laytime_utilization'] || '',
+                laytimePercentageUtilization: ev['Laytime % Utilization'] || ev['laytime_percentage_utilization'] || ev['laytime_percentage'] || ev['percentage_utilization'] || '',
+                laytimeConsumed: ev['Laytime Consumed'] || ev['laytime_consumed'] || ev['Duration'] || ev['duration'] || ev['laytime_used'] || '',
+                laytimeRemaining: ev['Laytime Remaining'] || ev['laytime_remaining'] || ev['laytime_left'] || ''
             };
             console.log('Mapped event:', mappedEvent);
             return mappedEvent;
@@ -263,6 +494,19 @@ class ExtractionResults {
         }
         
         this.renderEventsTable();
+        
+        // Log the calculated time utilizations for debugging
+        console.log('=== Time Utilization Calculations ===');
+        this.events.forEach((event, index) => {
+            const timeCalc = this.calculateTimeUtilization(event.startDateTime, event.endDateTime);
+            console.log(`Event ${index + 1}:`, {
+                start: event.startDateTime,
+                end: event.endDateTime,
+                timeUtilization: timeCalc.timeUtilization,
+                percentageUtilization: timeCalc.percentageUtilization
+            });
+        });
+        console.log('=== End Time Utilization Calculations ===');
     }
 
     // Convert "08 Jun 2024" to "2024-06-08" for input/date parsing
@@ -343,42 +587,272 @@ class ExtractionResults {
     // Populate events (handled in renderFromBackendResult now)
     populateEventsTable() { this.renderEventsTable(); }
 
-    // Render events table
+    // Parse datetime strings into Date objects
+    parseDateTime(dateTimeStr) {
+        if (!dateTimeStr || dateTimeStr === '-') return null;
+        
+        try {
+            // Handle various date/time formats
+            let cleanStr = dateTimeStr.trim();
+            
+            // If it's just a time (HH.MM or HH:MM), assume today's date
+            if (/^\d{1,2}[:.]\d{2}$/.test(cleanStr)) {
+                const today = new Date().toDateString();
+                cleanStr = `${today} ${cleanStr.replace('.', ':')}`;
+            }
+            
+            // Replace dots with colons in time part
+            cleanStr = cleanStr.replace(/(\d{1,2})\.(\d{2})/, '$1:$2');
+            
+            const date = new Date(cleanStr);
+            return isNaN(date.getTime()) ? null : date;
+        } catch (e) {
+            console.warn('Failed to parse datetime:', dateTimeStr);
+            return null;
+        }
+    }
+
+    // Calculate time difference in hours between two datetime strings
+    calculateHoursDifference(startStr, endStr) {
+        const startDate = this.parseDateTime(startStr);
+        const endDate = this.parseDateTime(endStr);
+        
+        if (!startDate || !endDate) return 0;
+        
+        let diffMs = endDate.getTime() - startDate.getTime();
+        
+        // If end time is earlier than start time, assume it's the next day
+        if (diffMs < 0) {
+            diffMs += 24 * 60 * 60 * 1000; // Add 24 hours in milliseconds
+        }
+        
+        return diffMs / (1000 * 60 * 60); // Convert to hours
+    }
+
+    // Format hours to days and hours display
+    formatHoursToDaysHours(hours) {
+        if (hours === 0) return '0.00h';
+        
+        const days = Math.floor(hours / 24);
+        const remainingHours = hours % 24;
+        
+        if (days > 0) {
+            return `${days}d ${remainingHours.toFixed(2)}h`;
+        } else {
+            return `${remainingHours.toFixed(2)}h`;
+        }
+    }
+
+    // Calculate laytime utilization and remaining for each event
+    calculateLaytimeMetrics() {
+        const allowedLaytimeDays = parseFloat(document.getElementById('allowed-laytime')?.value || 0);
+        const allowedLaytimeHours = allowedLaytimeDays * 24;
+        
+        let cumulativeConsumed = 0;
+        
+        return this.events.map((event, index) => {
+            // Calculate utilization for this event
+            const utilizationHours = this.calculateHoursDifference(event.startDateTime, event.endDateTime);
+            cumulativeConsumed += utilizationHours;
+            
+            // Calculate remaining laytime
+            const remainingHours = allowedLaytimeHours - cumulativeConsumed;
+            
+            return {
+                ...event,
+                utilizationHours,
+                remainingHours,
+                cumulativeConsumed
+            };
+        });
+    }
+
+    // Calculate time difference between start and end times (keeping original for compatibility)
+    calculateTimeUtilization(startDateTime, endDateTime) {
+        const hours = this.calculateHoursDifference(startDateTime, endDateTime);
+        
+        return {
+            timeUtilization: this.formatHoursToDaysHours(hours),
+            percentageUtilization: hours > 0 ? ((hours / 24) * 100).toFixed(2) + '%' : '0%'
+        };
+    }
+    
+    // Convert time string (HH.MM) to minutes - keeping for compatibility
+    timeToMinutes(timeStr) {
+        if (!timeStr) return null;
+        
+        try {
+            // Handle different time formats
+            const time = timeStr.replace(/[^\d.]/g, ''); // Remove non-digits and non-dots
+            const parts = time.split('.');
+            
+            if (parts.length === 2) {
+                const hours = parseInt(parts[0]);
+                const minutes = parseInt(parts[1]);
+                return hours * 60 + minutes;
+            } else if (parts.length === 1) {
+                // Assume it's hours only
+                return parseInt(parts[0]) * 60;
+            }
+            
+            return null;
+        } catch (error) {
+            console.error('Error converting time to minutes:', error);
+            return null;
+        }
+    }
+    
+    // Convert minutes to time string (HH.MM) - keeping for compatibility
+    minutesToTime(minutes) {
+        if (minutes === null || minutes < 0) return '';
+        
+        const hours = Math.floor(minutes / 60);
+        const mins = minutes % 60;
+        return `${hours.toString().padStart(2, '0')}.${mins.toString().padStart(2, '0')}`;
+    }
+    
+    // Recalculate all time utilizations and update the table
+    recalculateTimeUtilizations() {
+        console.log('Recalculating time utilizations for all events...');
+        
+        // Recalculate all metrics
+        const updatedEvents = this.calculateLaytimeMetrics();
+        this.events = updatedEvents;
+        
+        // Re-render the table with updated calculations
+        this.renderEventsTable();
+        
+        console.log('Time utilizations recalculated and table updated');
+    }
+
+    // Render events table with proper column alignment and new columns
     renderEventsTable() {
-		const tbody = document.getElementById('events-tbody');
-		if (!tbody) return;
-		
+        const tbody = document.getElementById('events-tbody');
+        if (!tbody) return;
+        
+        // Update table header if needed
+        this.updateTableHeader();
+        
         tbody.innerHTML = '';
 
-        this.events.forEach((event, index) => {
+        // Calculate metrics for all events
+        const eventsWithMetrics = this.calculateLaytimeMetrics();
+
+        eventsWithMetrics.forEach((event, index) => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${event.events}</td>
-                <td>${event.day}</td>
-                <td>${event.startDateTime}</td>
-                <td>${event.endDateTime}</td>
-                <td>${event.laytimeTimeUtilization}</td>
-                <td>${event.laytimePercentageUtilization}</td>
-                <td>${event.laytimeConsumed}</td>
-                <td>${event.laytimeRemaining}</td>
+                <td>${event.events || ''}</td>
+                <td>${event.day || ''}</td>
+                <td>${event.startDateTime || ''}</td>
+                <td>${event.endDateTime || ''}</td>
+                <td>${this.formatHoursToDaysHours(event.utilizationHours)}</td>
+                <td>${this.formatHoursToDaysHours(event.remainingHours)}</td>
                 <td>
-                    <button class="btn btn-sm btn-secondary" onclick="editEvent(${index})">
+                    <button class="btn btn-sm btn-secondary" onclick="editEvent(${index})" title="Edit Event">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteEvent(${index})">
+                    <button class="btn btn-sm btn-danger" onclick="deleteEvent(${index})" title="Delete Event">
                         <i class="fas fa-trash"></i>
                     </button>
-					</td>
-				`;
+                </td>
+            `;
             tbody.appendChild(row);
         });
+
+        // Update laytime summary
+        this.updateLaytimeSummary(eventsWithMetrics);
+    }
+
+    // Update table header to include new columns
+    updateTableHeader() {
+        const thead = document.querySelector('.events-table thead');
+        if (!thead) return;
+
+        const headerRow = thead.querySelector('tr');
+        if (!headerRow) return;
+
+        // Check if new columns already exist
+        const existingHeaders = headerRow.querySelectorAll('th');
+        if (existingHeaders.length === 7) return; // Already updated
+
+        // Update header HTML
+        headerRow.innerHTML = `
+            <th>EVENTS</th>
+            <th>DAY</th>
+            <th>START DATE TIME</th>
+            <th>END DATE TIME</th>
+            <th>LAYTIME UTILIZATION</th>
+            <th>LAYTIME REMAINING</th>
+            <th>ACTIONS</th>
+        `;
+    }
+
+    // Update laytime summary section
+    updateLaytimeSummary(eventsWithMetrics) {
+        const summarySection = document.getElementById('laytimeSummary');
+        if (!summarySection) return;
+
+        const allowedLaytimeDays = parseFloat(document.getElementById('allowed-laytime')?.value || 0);
+        const allowedLaytimeHours = allowedLaytimeDays * 24;
+        
+        // Calculate totals
+        const totalConsumedHours = eventsWithMetrics.reduce((sum, event) => sum + event.utilizationHours, 0);
+        const totalRemainingHours = allowedLaytimeHours - totalConsumedHours;
+        
+        // Update summary display elements
+        const totalLaytimeElement = document.getElementById('total-laytime');
+        const laytimeRemainingElement = document.getElementById('laytime-remaining');
+        const demurrageCostElement = document.getElementById('demurrage-cost');
+        const dispatchCreditElement = document.getElementById('dispatch-credit');
+        
+        if (totalLaytimeElement) {
+            totalLaytimeElement.textContent = this.formatHoursToDaysHours(totalConsumedHours);
+        }
+        
+        if (laytimeRemainingElement) {
+            laytimeRemainingElement.textContent = this.formatHoursToDaysHours(Math.abs(totalRemainingHours));
+            
+            // Change color based on demurrage/dispatch
+            if (totalRemainingHours < 0) {
+                laytimeRemainingElement.style.color = '#ef4444'; // Red for demurrage
+            } else {
+                laytimeRemainingElement.style.color = '#10b981'; // Green for dispatch
+            }
+        }
+        
+        // Calculate demurrage or dispatch costs
+        const demurrageRate = parseFloat(document.getElementById('demurrage')?.value || 0);
+        const dispatchRate = parseFloat(document.getElementById('dispatch')?.value || 0);
+        
+        if (demurrageCostElement && dispatchCreditElement) {
+            if (totalRemainingHours < 0) {
+                // Demurrage situation
+                const demurrageDays = Math.abs(totalRemainingHours) / 24;
+                const demurrageCost = demurrageDays * demurrageRate;
+                demurrageCostElement.textContent = `${demurrageCost.toFixed(2)}`;
+                dispatchCreditElement.textContent = '$0.00';
+            } else if (totalRemainingHours > 0) {
+                // Dispatch situation
+                const dispatchDays = totalRemainingHours / 24;
+                const dispatchCredit = dispatchDays * dispatchRate;
+                demurrageCostElement.textContent = '$0.00';
+                dispatchCreditElement.textContent = `${dispatchCredit.toFixed(2)}`;
+            } else {
+                // Exactly on time
+                demurrageCostElement.textContent = '$0.00';
+                dispatchCreditElement.textContent = '$0.00';
+            }
+        }
+        
+        // Show summary section
+        summarySection.style.display = 'block';
     }
 
     // Format date for display
     formatDate(dateString) {
-        if (!dateString) return '–';
+        if (!dateString) return '—';
         const date = new Date(dateString);
-        if (isNaN(date.getTime())) return '–';
+        if (isNaN(date.getTime())) return '—';
         return date.toLocaleDateString('en-GB', {
             day: '2-digit',
             month: 'short',
@@ -556,25 +1030,16 @@ function saveNewEvent() {
         return;
     }
 
-    // Calculate duration if end time is provided
-    let duration = '';
-    if (endTime) {
-        const start = new Date(`2000-01-01T${startTime}`);
-        const end = new Date(`2000-01-01T${endTime}`);
-        const hours = (end - start) / (1000 * 60 * 60);
-        duration = `${hours}h`;
-    }
-
     // Add new event - use the same structure as displayed events
     const newEvent = {
         events: description,
         day: '-',
         startDateTime: `${date} ${startTime}`,
         endDateTime: endTime ? `${date} ${endTime}` : `${date} ${startTime}`,
-        laytimeTimeUtilization: duration || '-',
-        laytimePercentageUtilization: '-',
-        laytimeConsumed: duration || '-',
-        laytimeRemaining: '-'
+        laytimeTimeUtilization: '',
+        laytimePercentageUtilization: '',
+        laytimeConsumed: '',
+        laytimeRemaining: ''
     };
 
     extractionResults.events.push(newEvent);
@@ -635,25 +1100,16 @@ function saveEditedEvent() {
         return;
     }
 
-    // Calculate duration if end time is provided
-    let duration = '';
-    if (endTime) {
-        const start = new Date(`2000-01-01T${startTime}`);
-        const end = new Date(`2000-01-01T${endTime}`);
-        const hours = (end - start) / (1000 * 60 * 60);
-        duration = `${hours}h`;
-    }
-
     // Update event - use the same structure as displayed events
     extractionResults.events[index] = {
         events: description,
         day: '-',
         startDateTime: `${date} ${startTime}`,
         endDateTime: endTime ? `${date} ${endTime}` : `${date} ${startTime}`,
-        laytimeTimeUtilization: duration || '-',
-        laytimePercentageUtilization: '-',
-        laytimeConsumed: duration || '-',
-        laytimeRemaining: '-'
+        laytimeTimeUtilization: '',
+        laytimePercentageUtilization: '',
+        laytimeConsumed: '',
+        laytimeRemaining: ''
     };
 
     extractionResults.renderEventsTable();
@@ -671,6 +1127,13 @@ function deleteEvent(index) {
 // Calculate laytime
 function calculateLaytime() {
     extractionResults.calculateLaytime();
+}
+
+// Recalculate time utilizations
+function recalculateTimeUtilizations() {
+    if (window.extractionResults) {
+        window.extractionResults.recalculateTimeUtilizations();
+    }
 }
 
 // Show help
@@ -712,4 +1175,17 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Set current year in footer
     document.getElementById('year').textContent = new Date().getFullYear();
+    
+    // Debug: Check if form fields are accessible
+    console.log('=== DOM Loaded - Form Field Check ===');
+    const fieldIds = ['vessel-name', 'master', 'agent', 'port-loading', 'port-discharge', 'cargo', 'quantity'];
+    fieldIds.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            console.log(`✓ DOM Ready - Found field: ${id}`);
+        } else {
+            console.log(`✗ DOM Ready - Missing field: ${id}`);
+        }
+    });
+    console.log('=== End DOM Check ===');
 });

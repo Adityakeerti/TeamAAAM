@@ -1,287 +1,640 @@
 <!doctype html>
 <html lang="en">
 <head>
-	<meta charset="utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title>SOF Extraction Results • Cargo Laytime</title>
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="assets/css/theme.css" />
-	<link rel="stylesheet" href="assets/css/extraction-results.css" />
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SOF Extraction Results • Cargo Laytime</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/theme.css" />
+    <link rel="stylesheet" href="assets/css/extraction-results.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Column width optimization for proper alignment */
+        .events-table th:nth-child(1),
+        .events-table td:nth-child(1) { /* EVENTS */
+            width: 30%;
+            min-width: 250px;
+			font-size: 11px;
+            white-space: normal;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+
+        .events-table th:nth-child(2),
+        .events-table td:nth-child(2) { /* DAY */
+            width: 8%;
+			font-size: 11px;
+            min-width: 60px;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .events-table th:nth-child(3),
+        .events-table td:nth-child(3) { /* START DATE TIME */
+            width: 15%;
+			font-size: 11px;
+            min-width: 120px;
+            white-space: nowrap;
+        }
+
+        .events-table th:nth-child(4),
+        .events-table td:nth-child(4) { /* END DATE TIME */
+            width: 15%;
+			font-size: 11px;
+            min-width: 120px;
+            white-space: nowrap;
+        }
+
+        .events-table th:nth-child(5),
+        .events-table td:nth-child(5) { /* LAYTIME UTILIZATION */
+            width: 20%;
+            min-width: 100px;
+			font-size: 11px;
+            white-space: nowrap;
+            text-align: center;
+            font-weight: 600;
+            color: #3b82f6;
+        }
+
+        .events-table th:nth-child(6),
+        .events-table td:nth-child(6) { /* LAYTIME REMAINING */
+            width: 20%;
+			font-size: 11px;
+            min-width: 100px;
+            white-space: nowrap;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .events-table th:nth-child(7),
+        .events-table td:nth-child(7) { /* ACTIONS */
+            width: 8%;
+            min-width: 80px;
+            white-space: nowrap;
+			font-size: 11px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        /* Ensure proper alignment for action buttons */
+        .events-table td:nth-child(7) {
+            display: flex;
+            gap: 4px;
+			font-size: 11px;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 12px;
+        }
+
+        /* Style the action buttons */
+        .events-table td:nth-child(7) .btn-sm {
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            min-width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+
+        /* Enhanced styling for new columns */
+        .events-table th:nth-child(5),
+        .events-table th:nth-child(6) {
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+            font-weight: 700;
+            text-align: center;
+            color: #1e293b;
+            border-left: 1px solid #d1d5db;
+        }
+
+        .events-table td:nth-child(5) {
+            background: rgba(59, 130, 246, 0.05);
+            border-left: 1px solid #e2e8f0;
+        }
+
+        .events-table td:nth-child(6) {
+            background: rgba(16, 185, 129, 0.05);
+            border-left: 1px solid #e2e8f0;
+        }
+
+        /* Update table minimum width to accommodate new columns */
+        .events-table table {
+            min-width: 1000px;
+        }
+
+    </style>
 </head>
 <body>
-	<!-- Top Navigation Bar -->
-	<nav class="top-nav">
-		<div class="nav-container">
-			<div class="nav-left">
-				<div class="logo">
-					<i class="fas fa-ship"></i>
-					<span>Cargo LayTime</span>
-				</div>
-			</div>
-			
-			<div class="nav-right">
-				<div class="user-profile" id="userProfile">
-					<div class="avatar" id="avatar">
-						<i class="fas fa-user"></i>
-					</div>
-					<div class="dropdown-menu" id="dropdownMenu">
-						<div class="dropdown-item" onclick="showAccountDetails()">
-							<i class="fas fa-user-cog"></i>
-							<span>Account Details</span>
-						</div>
-						<div class="dropdown-item" onclick="logout()">
-							<i class="fas fa-sign-out-alt"></i>
-							<span>Log Out</span>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</nav>
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <div class="logo">
+                    <i class="fas fa-ship"></i>
+                    <span>Cargo LayTime</span>
+                </div>
+            </div>
+            
+            <div class="nav-right">
+                <div class="user-profile" id="userProfile">
+                    <div class="avatar" id="avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <div class="dropdown-item" onclick="showAccountDetails()">
+                            <i class="fas fa-user-cog"></i>
+                            <span>Account Details</span>
+                        </div>
+                        <div class="dropdown-item" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Log Out</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-	<main class="workspace">
-		<div class="workspace-card">
-			<div class="topbar">
-				<div class="breadcrumb">
-					<span>SOF Extraction Results</span>
-				</div>
-				<div class="actions">
-					<button class="action-btn btn-primary" id="calculateBtn" onclick="calculateLaytime()">
-						<i class="fas fa-calculator"></i> Calculate Laytime
-					</button>
-				</div>
-			</div>
+    <main class="workspace">
+        <div class="workspace-card">
+            <div class="topbar">
+                <div class="breadcrumb">
+                    <span>SOF Extraction Results</span>
+                </div>
+                <div class="actions">
+                    <button class="action-btn btn-primary" id="calculateBtn" onclick="calculateLaytime()">
+                        <i class="fas fa-calculator"></i> Calculate Laytime
+                    </button>
+                    <div class="dropdown">
+                        <button class="action-btn btn-secondary dropdown-toggle" onclick="toggleExportDropdown()">
+                            <i class="fas fa-download"></i> Export
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="dropdown-menu" id="exportDropdown">
+                            <div class="dropdown-item" onclick="exportAsJSON()">
+                                <i class="fas fa-file-code"></i> Export as JSON
+                            </div>
+                            <div class="dropdown-item" onclick="exportAsCSV()">
+                                <i class="fas fa-file-csv"></i> Export as CSV
+                            </div>
+                            <div class="dropdown-item" onclick="exportAsPDF()">
+                                <i class="fas fa-file-pdf"></i> Export as PDF
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-			<!-- Split Layout: Form on Left, Results on Right -->
-			<div class="split-layout">
-				<!-- Left Panel: Vessel/Voyage Information Form -->
-				<div class="left-panel">
-					<div class="panel-header">
-						<h2><i class="fas fa-ship"></i> Vessel & Voyage Details</h2>
-						<div class="success-banner" id="successBanner">
-							<div class="success-icon">✅</div>
-							<div>
-								<h3>SOF Document Parsed Successfully</h3>
-								<p>Review and edit the extracted details below</p>
-							</div>
-						</div>
-					</div>
-					
-					<div class="data-form" id="data-form">
-						<!-- PDF Upload Section -->
-						<div class="pdf-upload-section">
-							<h3><i class="fas fa-upload"></i> Upload PDF for Processing</h3>
-							<div class="upload-area">
-								<input type="file" id="pdfFileInput" accept=".pdf" style="display: none;" />
-								<button class="btn btn-primary" onclick="document.getElementById('pdfFileInput').click()">
-									<i class="fas fa-file-pdf"></i> Choose PDF File
-								</button>
-								<span id="selectedFileName" class="selected-file">No file selected</span>
-							</div>
-							<button class="btn btn-success" id="processPdfBtn" onclick="processSelectedPDF()" disabled>
-								<i class="fas fa-cogs"></i> Process PDF
-							</button>
-						</div>
-						
-						<div class="form-grid">
-							<div class="form-item">
-								<label class="label">VESSEL NAME</label>
-								<input class="input-sm" id="vessel-name" placeholder="e.g., M.V. ORION TRADER" />
-							</div>
-							<div class="form-item">
-								<label class="label">MASTER</label>
-								<input class="input-sm" id="master" placeholder="e.g., CAPTAIN A. K. SINGH" />
-							</div>
-							<div class="form-item">
-								<label class="label">AGENT</label>
-								<input class="input-sm" id="agent" placeholder="e.g., GLOBAL MARITIME SERVICES LTD" />
-							</div>
-							<div class="form-item">
-								<label class="label">PORT OF LOADING</label>
-								<input class="input-sm" id="port-loading" placeholder="e.g., Koh Sichang, Thailand" />
-							</div>
-							<div class="form-item">
-								<label class="label">PORT OF DISCHARGE</label>
-								<input class="input-sm" id="port-discharge" placeholder="e.g., New York, USA" />
-							</div>
-							<div class="form-item">
-								<label class="label">CARGO</label>
-								<input class="input-sm" id="cargo" placeholder="e.g., Bagged Rice" />
-							</div>
-							<div class="form-item">
-								<label class="label">QUANTITY (MT)</label>
-								<input class="input-sm" id="quantity" type="number" placeholder="e.g., 41998" />
-							</div>
-							<div class="form-item">
-								<label class="label">ALLOWED LAYTIME (DAYS)</label>
-								<input class="input-sm" id="allowed-laytime" type="number" placeholder="e.g., 5" />
-							</div>
-							<div class="form-item">
-								<label class="label">DEMURRAGE ($/DAY)</label>
-								<input class="input-sm" id="demurrage" type="number" placeholder="e.g., 5000" />
-							</div>
-							<div class="form-item">
-								<label class="label">DISPATCH ($/DAY)</label>
-								<input class="input-sm" id="dispatch" type="number" placeholder="e.g., 2500" />
-							</div>
-							<div class="form-item">
-								<label class="label">RATE (MT/DAY)</label>
-								<input class="input-sm" id="rate" type="number" placeholder="e.g., 1000" />
-							</div>
-						</div>
-					</div>
-				</div>
+            <div class="split-layout">
+                <div class="left-panel">
+                    <div class="panel-header">
+                        <h2><i class="fas fa-ship"></i> Vessel & Voyage Details</h2>
+                        <div class="success-banner" id="successBanner" style="display: none;">
+                            <div class="success-icon">✅</div>
+                            <div>
+                                <h3>SOF Document Parsed Successfully</h3>
+                                <p>Review and edit the extracted details below</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="data-form" id="data-form">
+                        <div class="form-grid">
+                            <div class="form-item">
+                                <label class="label">VESSEL NAME</label>
+                                <input class="input-sm" id="vessel-name" placeholder="e.g., M.V. ORION TRADER" />
+                            </div>
+                            <div class="form-item">
+                                <label class="label">MASTER</label>
+                                <input class="input-sm" id="master" placeholder="e.g., CAPTAIN A. K. SINGH" />
+                            </div>
+                            <div class="form-item">
+                                <label class="label">AGENT</label>
+                                <input class="input-sm" id="agent" placeholder="e.g., GLOBAL MARITIME SERVICES LTD" />
+                            </div>
+                            <div class="form-item">
+                                <label class="label">PORT OF LOADING</label>
+                                <input class="input-sm" id="port-loading" placeholder="e.g., Koh Sichang, Thailand" />
+                            </div>
+                            <div class="form-item">
+                                <label class="label">PORT OF DISCHARGE</label>
+                                <input class="input-sm" id="port-discharge" placeholder="e.g., New York, USA" />
+                            </div>
+                            <div class="form-item">
+                                <label class="label">CARGO</label>
+                                <input class="input-sm" id="cargo" placeholder="e.g., Bagged Rice" />
+                            </div>
+                            <div class="form-item">
+                                <label class="label">QUANTITY (MT)</label>
+                                <input class="input-sm" id="quantity" type="number" placeholder="e.g., 41998" />
+                            </div>
+                            <div class="form-item">
+                                <label class="label">ALLOWED LAYTIME (DAYS)</label>
+                                <input class="input-sm" id="allowed-laytime" type="number" placeholder="e.g., 5" />
+                            </div>
+                            <div class="form-item">
+                                <label class="label">DEMURRAGE ($/DAY)</label>
+                                <input class="input-sm" id="demurrage" type="number" placeholder="e.g., 5000" />
+                            </div>
+                            <div class="form-item">
+                                <label class="label">DISPATCH ($/DAY)</label>
+                                <input class="input-sm" id="dispatch" type="number" placeholder="e.g., 2500" />
+                            </div>
+                            <div class="form-item">
+                                <label class="label">RATE (MT/DAY)</label>
+                                <input class="input-sm" id="rate" type="number" placeholder="e.g., 1000" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-				<!-- Right Panel: Events Timeline Table -->
-				<div class="right-panel" id="right-panel">
-					<div class="panel-header">
-						<h2><i class="fas fa-calendar-alt"></i> Chronology of Events</h2>
-						<button class="btn btn-primary" onclick="addNewEvent()">
-							<i class="fas fa-plus"></i> Add Event
-						</button>
-					</div>
-					
-					<!-- Events Table -->
-					<div class="events-section">
-						<div class="events-table">
-							<table>
-								<thead>
-									<tr>
-										<th>EVENTS</th>
-										<th>DAY</th>
-										<th>START DATE TIME</th>
-										<th>END DATE TIME</th>
-										<th>LAYTIME TIME UTILIZATION</th>
-										<th>LAYTIME % UTILIZATION</th>
-										<th>LAYTIME CONSUMED</th>
-										<th>LAYTIME REMAINING</th>
-										<th>ACTIONS</th>
-									</tr>
-								</thead>
-								<tbody id="events-tbody">
-									<!-- Events will be populated here -->
-								</tbody>
-							</table>
-						</div>
-					</div>
+                <div class="right-panel" id="right-panel">
+                    <div class="panel-header">
+                        <h2><i class="fas fa-calendar-alt"></i> Chronology of Events</h2>
+                        <div class="header-actions">
+                            <button class="btn btn-secondary" onclick="recalculateTimeUtilizations()" title="Recalculate time utilizations">
+                                <i class="fas fa-calculator"></i> Recalculate Time
+                            </button>
+                            <button class="btn btn-primary" onclick="addNewEvent()">
+                                <i class="fas fa-plus"></i> Add Event
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="events-section">
+                        <div class="events-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>EVENTS</th>
+                                        <th>DAY</th>
+                                        <th>START DATE TIME</th>
+                                        <th>END DATE TIME</th>
+                                        <th>LAYTIME UTILIZATION</th>
+                                        <th>LAYTIME REMAINING</th>
+                                        <th>ACTIONS</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="events-tbody">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
 
-					<!-- Laytime Summary -->
-					<div class="laytime-summary" id="laytimeSummary" style="display: none;">
-						<div class="summary-grid">
-							<div class="summary-item">
-								<label>Total Laytime Used:</label>
-								<span id="total-laytime">0.00 Days</span>
-							</div>
-							<div class="summary-item">
-								<label>Laytime Remaining:</label>
-								<span id="laytime-remaining">0.00 Days</span>
-							</div>
-							<div class="summary-item">
-								<label>Demurrage Cost:</label>
-								<span id="demurrage-cost">$0.00</span>
-							</div>
-							<div class="summary-item">
-								<label>Dispatch Credit:</label>
-								<span id="dispatch-credit">$0.00</span>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</main>
+                    <div class="laytime-summary" id="laytimeSummary" style="display: none;">
+                        <div class="summary-grid">
+                            <div class="summary-item">
+                                <label>Total Laytime Used:</label>
+                                <span id="total-laytime">0.00 Days</span>
+                            </div>
+                            <div class="summary-item">
+                                <label>Laytime Remaining:</label>
+                                <span id="laytime-remaining">0.00 Days</span>
+                            </div>
+                            <div class="summary-item">
+                                <label>Demurrage Cost:</label>
+                                <span id="demurrage-cost">$0.00</span>
+                            </div>
+                            <div class="summary-item">
+                                <label>Dispatch Credit:</label>
+                                <span id="dispatch-credit">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 
-	<!-- Add Event Modal -->
-	<div class="modal" id="addEventModal">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h3>Add New Event</h3>
-				<button class="close-btn" onclick="closeAddEventModal()">×</button>
-			</div>
-			<div class="modal-body">
-				<div class="form-group">
-					<label>Event Description</label>
-					<input type="text" id="newEventDesc" placeholder="e.g., Loading Bags" />
-				</div>
-				<div class="form-group">
-					<label>Date</label>
-					<input type="date" id="newEventDate" />
-				</div>
-				<div class="form-group">
-					<label>Start Time</label>
-					<input type="time" id="newEventStart" />
-				</div>
-				<div class="form-group">
-					<label>End Time</label>
-					<input type="time" id="newEventEnd" />
-				</div>
-				<div class="form-group">
-					<label>Remarks</label>
-					<input type="text" id="newEventRemarks" placeholder="e.g., 1st shift" />
-				</div>
-			</div>
-			<div class="modal-footer">
-				<button class="btn btn-secondary" onclick="closeAddEventModal()">Cancel</button>
-				<button class="btn btn-primary" onclick="saveNewEvent()">Add Event</button>
-			</div>
-		</div>
-	</div>
+    <div class="modal" id="addEventModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Event</h3>
+                <button class="close-btn" onclick="closeAddEventModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Event Description</label>
+                    <input type="text" id="newEventDesc" placeholder="e.g., Loading Bags" />
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="newEventDate" />
+                </div>
+                <div class="form-group">
+                    <label>Start Time</label>
+                    <input type="time" id="newEventStart" />
+                </div>
+                <div class="form-group">
+                    <label>End Time</label>
+                    <input type="time" id="newEventEnd" />
+                </div>
+                <div class="form-group">
+                    <label>Remarks</label>
+                    <input type="text" id="newEventRemarks" placeholder="e.g., 1st shift" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeAddEventModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveNewEvent()">Add Event</button>
+            </div>
+        </div>
+    </div>
 
-	<!-- Edit Event Modal -->
-	<div class="modal" id="editEventModal">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h3>Edit Event</h3>
-				<button class="close-btn" onclick="closeEditEventModal()">×</button>
-			</div>
-			<div class="modal-body">
-				<input type="hidden" id="editEventIndex" />
-				<div class="form-group">
-					<label>Event Description</label>
-					<input type="text" id="editEventDesc" />
-				</div>
-				<div class="form-group">
-					<label>Date</label>
-					<input type="date" id="editEventDate" />
-				</div>
-				<div class="form-group">
-					<label>Start Time</label>
-					<input type="time" id="editEventStart" />
-				</div>
-				<div class="form-group">
-					<label>End Time</label>
-					<input type="time" id="editEventEnd" />
-				</div>
-				<div class="form-group">
-					<label>Remarks</label>
-					<input type="text" id="editEventRemarks" />
-				</div>
-			</div>
-			<div class="modal-footer">
-				<button class="btn btn-secondary" onclick="closeEditEventModal()">Cancel</button>
-				<button class="btn btn-primary" onclick="saveEditedEvent()">Save Changes</button>
-			</div>
-		</div>
-	</div>
+    <div class="modal" id="editEventModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Event</h3>
+                <button class="close-btn" onclick="closeEditEventModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editEventIndex" />
+                <div class="form-group">
+                    <label>Event Description</label>
+                    <input type="text" id="editEventDesc" />
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="editEventDate" />
+                </div>
+                <div class="form-group">
+                    <label>Start Time</label>
+                    <input type="time" id="editEventStart" />
+                </div>
+                <div class="form-group">
+                    <label>End Time</label>
+                    <input type="time" id="editEventEnd" />
+                </div>
+                <div class="form-group">
+                    <label>Remarks</label>
+                    <input type="text" id="editEventRemarks" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeEditEventModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveEditedEvent()">Save Changes</button>
+            </div>
+        </div>
+    </div>
 
-	<!-- Loading Overlay -->
-	<div class="loading-overlay" id="loadingOverlay" style="display: none;">
-		<div class="loading-spinner">
-			<i class="fas fa-spinner fa-spin"></i>
-			<p id="loadingText">Processing...</p>
-		</div>
-	</div>
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p id="loadingText">Processing...</p>
+        </div>
+    </div>
 
-	<footer class="footer">
-		<div class="container">
-			<span>© <span id="year"></span> Cargo Laytime. All rights reserved.</span>
-		</div>
-	</footer>
+    <footer class="footer">
+        <div class="container">
+            <span>© <span id="year"></span> Cargo Laytime. All rights reserved.</span>
+        </div>
+    </footer>
 
-	<script src="assets/js/app.js"></script>
-	<script src="assets/js/extraction-results.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/extraction-results.js"></script>
+    
+    <script>
+        // Toggle export dropdown
+        function toggleExportDropdown() {
+            const dropdown = document.getElementById('exportDropdown');
+            dropdown.classList.toggle('show');
+        }
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('exportDropdown');
+            const exportBtn = document.querySelector('.dropdown-toggle');
+            
+            if (dropdown && exportBtn && !exportBtn.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+        
+        // Export as JSON
+        function exportAsJSON() {
+            // Collect form data
+            const formData = {
+                vessel_info: {
+                    vessel_name: document.getElementById('vessel-name').value || '',
+                    master: document.getElementById('master').value || '',
+                    agent: document.getElementById('agent').value || '',
+                    port_loading: document.getElementById('port-loading').value || '',
+                    port_discharge: document.getElementById('port-discharge').value || '',
+                    cargo: document.getElementById('cargo').value || '',
+                    quantity: document.getElementById('quantity').value || '',
+                    allowed_laytime: document.getElementById('allowed-laytime').value || '',
+                    demurrage: document.getElementById('demurrage').value || '',
+                    dispatch: document.getElementById('dispatch').value || '',
+                    rate: document.getElementById('rate').value || ''
+                },
+                events: window.extractionResults ? window.extractionResults.events : []
+            };
+            
+            // Create and download JSON file
+            const dataStr = JSON.stringify(formData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'cargo_laytime_data.json';
+            link.click();
+            URL.revokeObjectURL(url);
+            
+            // Close dropdown
+            document.getElementById('exportDropdown').classList.remove('show');
+        }
+        
+        // Export as CSV
+        function exportAsCSV() {
+            // Collect form data
+            const vesselInfo = {
+                vessel_name: document.getElementById('vessel-name').value || '',
+                master: document.getElementById('master').value || '',
+                agent: document.getElementById('agent').value || '',
+                port_loading: document.getElementById('port-loading').value || '',
+                port_discharge: document.getElementById('port-discharge').value || '',
+                cargo: document.getElementById('cargo').value || '',
+                quantity: document.getElementById('quantity').value || '',
+                allowed_laytime: document.getElementById('allowed-laytime').value || '',
+                demurrage: document.getElementById('demurrage').value || '',
+                dispatch: document.getElementById('dispatch').value || '',
+                rate: document.getElementById('rate').value || ''
+            };
+            
+            const events = window.extractionResults ? window.extractionResults.events : [];
+            
+            // Create CSV content
+            let csvContent = 'Vessel Information\n';
+            csvContent += 'Field,Value\n';
+            Object.keys(vesselInfo).forEach(key => {
+                csvContent += `${key.replace(/_/g, ' ').toUpperCase()},${vesselInfo[key]}\n`;
+            });
+            
+            csvContent += '\nEvents Timeline\n';
+            if (events.length > 0) {
+                // Add headers
+                csvContent += 'Events,Day,Start Date Time,End Date Time,Laytime Utilization,Laytime Remaining\n';
+                
+                // Add event data
+                events.forEach(event => {
+                    const utilization = extractionResults.formatHoursToDaysHours(
+                        extractionResults.calculateHoursDifference(event.startDateTime, event.endDateTime)
+                    );
+                    csvContent += `"${event.events || ''}","${event.day || ''}","${event.startDateTime || ''}","${event.endDateTime || ''}","${utilization}",""\n`;
+                });
+            } else {
+                csvContent += 'No events found\n';
+            }
+            
+            // Create and download CSV file
+            const dataBlob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'cargo_laytime_data.csv';
+            link.click();
+            URL.revokeObjectURL(url);
+            
+            // Close dropdown
+            document.getElementById('exportDropdown').classList.remove('show');
+        }
+        
+        // Export as PDF
+        function exportAsPDF() {
+            // Show loading overlay
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const loadingText = document.getElementById('loadingText');
+            if (loadingOverlay) loadingOverlay.style.display = 'flex';
+            if (loadingText) loadingText.textContent = 'Generating PDF...';
+            
+            // Collect data
+            const vesselInfo = {
+                vessel_name: document.getElementById('vessel-name').value || '',
+                master: document.getElementById('master').value || '',
+                agent: document.getElementById('agent').value || '',
+                port_loading: document.getElementById('port-loading').value || '',
+                port_discharge: document.getElementById('port-discharge').value || '',
+                cargo: document.getElementById('cargo').value || '',
+                quantity: document.getElementById('quantity').value || '',
+                allowed_laytime: document.getElementById('allowed-laytime').value || '',
+                demurrage: document.getElementById('demurrage').value || '',
+                dispatch: document.getElementById('dispatch').value || '',
+                rate: document.getElementById('rate').value || ''
+            };
+            
+            const events = window.extractionResults ? window.extractionResults.events : [];
+            
+            // Create PDF content using jsPDF
+            try {
+                // Check if jsPDF is available
+                if (typeof jsPDF === 'undefined') {
+                    // Load jsPDF dynamically
+                    const script = document.createElement('script');
+                    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+                    script.onload = function() {
+                        generatePDF(vesselInfo, events);
+                    };
+                    script.onerror = function() {
+                        alert('Failed to load PDF library. Please try again.');
+                        if (loadingOverlay) loadingOverlay.style.display = 'none';
+                    };
+                    document.head.appendChild(script);
+                } else {
+                    generatePDF(vesselInfo, events);
+                }
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                alert('PDF generation failed. Please try again.');
+                if (loadingOverlay) loadingOverlay.style.display = 'none';
+            }
+            
+            // Close dropdown
+            document.getElementById('exportDropdown').classList.remove('show');
+        }
+        
+        // Generate PDF function
+        function generatePDF(vesselInfo, events) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Add title
+            doc.setFontSize(20);
+            doc.text('Cargo Laytime Report', 105, 20, { align: 'center' });
+            
+            // Add vessel information
+            doc.setFontSize(14);
+            doc.text('Vessel Information', 20, 40);
+            doc.setFontSize(10);
+            
+            let yPos = 50;
+            Object.keys(vesselInfo).forEach(key => {
+                if (vesselInfo[key]) {
+                    const label = key.replace(/_/g, ' ').toUpperCase();
+                    doc.text(`${label}: ${vesselInfo[key]}`, 20, yPos);
+                    yPos += 8;
+                }
+            });
+            
+            // Add events table
+            if (events.length > 0) {
+                yPos += 10;
+                doc.setFontSize(14);
+                doc.text('Events Timeline', 20, yPos);
+                yPos += 10;
+                
+                // Table headers
+                doc.setFontSize(8);
+                const headers = ['Events', 'Day', 'Start', 'End', 'Utilization'];
+                const colWidths = [60, 20, 30, 30, 30];
+                let xPos = 20;
+                
+                headers.forEach((header, index) => {
+                    doc.text(header, xPos, yPos);
+                    xPos += colWidths[index];
+                });
+                
+                yPos += 5;
+                
+                // Table data
+                events.forEach(event => {
+                    if (yPos > 250) {
+                        doc.addPage();
+                        yPos = 20;
+                    }
+                    
+                    xPos = 20;
+                    const utilization = extractionResults ? 
+                        extractionResults.formatHoursToDaysHours(
+                            extractionResults.calculateHoursDifference(event.startDateTime, event.endDateTime)
+                        ) : '';
+                    
+                    const rowData = [
+                        event.events || '',
+                        event.day || '',
+                        event.startDateTime || '',
+                        event.endDateTime || '',
+                        utilization
+                    ];
+                    
+                    rowData.forEach((cell, index) => {
+                        doc.text(cell.substring(0, 15), xPos, yPos);
+                        xPos += colWidths[index];
+                    });
+                    
+                    yPos += 6;
+                });
+            }
+            
+            // Save PDF
+            doc.save('cargo_laytime_report.pdf');
+            
+            // Hide loading overlay
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) loadingOverlay.style.display = 'none';
+        }
+    </script>
 </body>
-</html>
+</html> 
