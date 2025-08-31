@@ -1,0 +1,156 @@
+```json
+{
+  "header": {
+    "document_title": "STANDARD STATEMENT OF PACTS SHORT FORM"
+  },
+  "vessel_info": {
+    "name_of_vessel": "IOLCOS UNITY",
+    "name_of_master": "CAPT. RZHEVSKIY OLEG",
+    "port_of_loading_cargo": "UST-LUGA",
+    "description_of_cargo": "RUSSIAN STEAM COAL IN BULK",
+    "quantity_of_cargo": "72 106,029 MT"
+  },
+  "events": [
+    {
+      "event": "Arrived to Russian border, dropped anchor at international waters, NOR tendered",
+      "day": "Tuesday",
+      "start_date": "30.07",
+      "start_time": "23.00",
+      "end_time": "23.00"
+    },
+    {
+      "event": "Awaiting berthing instructions",
+      "day": "Tuesday",
+      "start_date": "30.07",
+      "start_time": "23.00",
+      "end_time": "24.00"
+    },
+    {
+      "event": "Awaiting berthing instructions",
+      "day": "Wednesday",
+      "start_date": "31.07",
+      "start_time": "00.00",
+      "end_time": "24.00"
+    },
+    {
+      "event": "Awaiting berthing instructions",
+      "day": "Thursday",
+      "start_date": "01.08",
+      "start_time": "00.00",
+      "end_time": "24.00"
+    },
+    {
+      "event": "Awaiting berthing instructions",
+      "day": "Friday",
+      "start_date": "02.08",
+      "start_time": "00.00",
+      "end_time": "16.20"
+    },
+    {
+      "event": "Passage to the Ust-Luga pilot station",
+      "day": "Friday",
+      "start_date": "02.08",
+      "start_time": "16.20",
+      "end_time": "24.00"
+    },
+    {
+      "event": "Passage to the Ust-Luga pilot station",
+      "day": "Saturday",
+      "start_date": "03.08",
+      "start_time": "00.00",
+      "end_time": "01.00"
+    },
+    {
+      "event": "Arrived pist",
+      "day": "Saturday",
+      "start_date": "03.08",
+      "start_time": "01.00",
+      "end_time": "01.00"
+    },
+    {
+      "event": "P.O.B. Pilotage to load berth",
+      "day": "Saturday",
+      "start_date": "03.08",
+      "start_time": "01.00",
+      "end_time": "03.18"
+    },
+    {
+      "event": "First line ashore, mooring ops, all fest, NOR re-tendered",
+      "day": "Saturday",
+      "start_date": "03.08",
+      "start_time": "03.18",
+      "end_time": "04.00"
+    },
+    {
+      "event": "Accommodation ladder rigging",
+      "day": "Saturday",
+      "start_date": "03.08",
+      "start_time": "04.00",
+      "end_time": "04.10"
+    },
+    {
+      "event": "Awaiting Authorities release",
+      "day": "Saturday",
+      "start_date": "03.08",
+      "start_time": "04.10",
+      "end_time": "06.30"
+    },
+    {
+      "event": "Inward clearance",
+      "day": "Saturday",
+      "start_date": "03.08",
+      "start_time": "06.30",
+      "end_time": "07.45"
+    },
+    {
+      "event": "Initial draft-survey, holds acceptance",
+      "day": "Saturday",
+      "start_date": "03.08",
+      "start_time": "07.45",
+      "end_time": "09.00"
+    },
+    {
+      "event": "Loading commenced",
+      "day": "Saturday",
+      "start_date": "03.08",
+      "start_time": "09.00",
+      "end_time": "09.00"
+    },
+    {
+      "event": "Loading",
+      "day": "Saturday",
+      "start_date": "03.08",
+      "start_time": "09.00",
+      "end_time": "13.00"
+    },
+    {
+      "event": "Stevedore's meal break",
+      "day": "Saturday",
+      "start_date": "03.08",
+      "start_time": "13.00",
+      "end_time": "14.00"
+    },
+    {
+      "event": "Loading",
+      "day": "Saturday",
+      "start_date": "03.08",
+      "start_time": "14.00",
+      "end_time": "19.30"
+    },
+    {
+      "event": "Stevedores shift change",
+      "day": "Saturday",
+      "start_date": "03.08",
+      "start_time": "19.30",
+      "end_time": "20.30"
+    },
+    {
+      "event": "Loading",
+      "day": "Saturday",
+      "start_date": "03.08",
+      "start_time": "20.30",
+      "end_time": "24.00"
+    }
+  ]
+}
+```

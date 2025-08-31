@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - Cargo Laytime and Event Tracker</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Background Video -->
+    <video autoplay muted loop id="background-video" class="background-video">
+        <source src="assets/images/video (1).mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    
+    <div class="background-overlay"></div>
+    
+    <main class="main-container">
+        <div class="glass-container">
+            <h1 class="main-title">Create Account</h1>
+            <p class="signup-subtitle">Join us to streamline your maritime operations</p>
+            
+            <form class="signup-form" onsubmit="handleSignupSubmit(event)">
+                <!-- Success/Error Message Container -->
+                <div id="message-container" class="message-container" style="display: none;">
+                    <div class="message-content">
+                        <div class="message-icon">
+                            <div class="spinner"></div>
+                        </div>
+                        <div class="message-text" id="message-text"></div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" id="username" name="username" class="form-input" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="password-input-container">
+                        <input type="password" id="password" name="password" class="form-input" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                            <svg class="eye-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword" class="form-label">Confirm Password</label>
+                    <div class="password-input-container">
+                        <input type="password" id="confirmPassword" name="confirmPassword" class="form-input" required>
+                        <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">
+                            <svg class="eye-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-options">
+                    <label class="checkbox-container">
+                        <input type="checkbox" name="terms" required>
+                        <span class="checkmark"></span>
+                        I agree to the <a href="#" class="link-text">Terms of Service</a> and <a href="#" class="link-text">Privacy Policy</a>
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn btn-signup">
+                    <span class="btn-text">Create Account</span>
+                    <div class="btn-overlay"></div>
+                </button>
+            </form>
+            
+            <div class="login-link">
+                <p>Already have an account? <a href="login.html" class="link-text">Sign in here</a></p>
+            </div>
+            
+            <div class="back-home">
+                <a href="index.html" class="back-link">← Back to Home</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Signup form handling
+        async function handleSignupSubmit(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const submitBtn = form.querySelector('.btn.btn-signup');
+            const username = form.querySelector('#username').value.trim();
+            const password = form.querySelector('#password').value;
+            const confirmPassword = form.querySelector('#confirmPassword').value;
+            const terms = form.querySelector('input[name="terms"]').checked;
+            
+            // Validation
+            if (username.length < 3) {
+                showMessage('Username must be at least 3 characters', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters', 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showMessage('Passwords do not match', 'error');
+                return;
+            }
+            
+            if (!terms) {
+                showMessage('Please agree to the terms and conditions', 'error');
+                return;
+            }
+            
+            // Show loading state
+            submitBtn.classList.add('loading');
+            showMessage('Creating account...', 'loading');
+            
+            try {
+                // Local-only signup (no backend): pretend success
+                showMessage('Account created successfully! Redirecting to login...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1200);
+            } catch (error) {
+                console.error('Signup error:', error);
+                showMessage('Signup failed. Please try again.', 'error');
+            } finally {
+                submitBtn.classList.remove('loading');
+            }
+        }
+        
+        // Message display functionality
+        function showMessage(text, type) {
+            const messageContainer = document.getElementById('message-container');
+            const messageText = document.getElementById('message-text');
+            
+            if (!messageContainer || !messageText) {
+                return;
+            }
+            
+            const spinner = messageContainer.querySelector('.spinner');
+            
+            // Set message text
+            messageText.textContent = text;
+            
+            // Remove all existing classes
+            messageContainer.className = 'message-container';
+            spinner.className = 'spinner';
+            
+            // Add appropriate classes
+            messageContainer.classList.add(type);
+            spinner.classList.add(type);
+            
+            // Show the message
+            messageContainer.style.display = 'block';
+            
+            // Auto-hide success messages after 3 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    hideMessage();
+                }, 3000);
+            }
+            
+            // Auto-hide error messages after 5 seconds
+            if (type === 'error') {
+                setTimeout(() => {
+                    hideMessage();
+                }, 5000);
+            }
+        }
+        
+        function hideMessage() {
+            const messageContainer = document.getElementById('message-container');
+            messageContainer.style.display = 'none';
+        }
+        
+        // Password toggle functionality
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const toggleBtn = input.parentElement.querySelector('.password-toggle');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                toggleBtn.classList.add('show-password');
+            } else {
+                input.type = 'password';
+                toggleBtn.classList.remove('show-password');
+            }
+        }
+    </script>
+</body>
+</html>

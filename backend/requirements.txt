@@ -1,0 +1,25 @@
+google-cloud-vision==3.7.0
+google-cloud-storage==2.16.0
+python-dotenv==1.0.1
+google-cloud-storage==2.16.0
+google-cloud-documentai==2.27.0
+google-generativeai==0.7.1
+python-dotenv==1.0.1
+transformers==4.42.3
+torch==2.3.1
+sentencepiece==0.2.0
+requests==2.32.3
+python-dotenv==1.0.1
+
+# This library is used to extract text directly from PDF files.
+PyPDF2==3.0.1
+# this is different section
+
+Pillow==10.4.0
+pdf2image==1.17.0
+pdf2image==1.17.0
+
+# FastAPI dependencies
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6

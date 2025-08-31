@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargo Laytime and Event Tracker</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Background Video -->
+    <video autoplay muted loop id="background-video" class="background-video">
+        <source src="assets/images/video (1).mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    
+    <div class="background-overlay"></div>
+    
+    <main class="main-container">
+        <div class="glass-container">
+            <h1 class="main-title">Cargo Laytime and Event Tracker</h1>
+            
+            <div class="button-group">
+                <button class="btn btn-login" onclick="handleLogin()">
+                    <span class="btn-text">Login</span>
+                    <div class="btn-overlay"></div>
+                </button>
+                
+                <button class="btn btn-signup" onclick="handleSignup()">
+                    <span class="btn-text">Create New Account</span>
+                    <div class="btn-overlay"></div>
+                </button>
+            </div>
+            
+
+        </div>
+    </main>
+
+    <script src="assets/js/script.js"></script>
+</body>
+</html>

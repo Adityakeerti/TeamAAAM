@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SoF Event Extractor - Dashboard</title>
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Background Video -->
+    <video autoplay muted loop id="background-video" class="background-video">
+        <source src="assets/images/video (1).mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    
+    <div class="background-overlay"></div>
+
+    <!-- Top Navigation Bar -->
+    <nav class="top-nav">
+        <div class="nav-container">
+            <div class="nav-left">
+                <div class="logo">
+                    <i class="fas fa-ship"></i>
+                    <span>Cargo LayTime</span>
+                </div>
+            </div>
+            
+            <div class="nav-right">
+                <div class="user-profile" id="userProfile">
+                    <div class="avatar" id="avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <div class="dropdown-item" onclick="showAccountDetails()">
+                            <i class="fas fa-user-cog"></i>
+                            <span>Account Details</span>
+                        </div>
+                        <div class="dropdown-item" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Log Out</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <div class="dashboard-container">
+            <!-- Centered Header -->
+            <div class="header-section">
+                <div class="header-content">
+                    <div class="header-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h1 class="main-title">SoF Event Extractor</h1>
+                    <p class="subtitle">Upload your shipping documents to extract events and timeline</p>
+                </div>
+            </div>
+
+            <!-- Upload Cards Container -->
+            <div class="upload-cards">
+                <!-- SOF File Upload Card -->
+                <div class="upload-card" id="sofCard">
+                    <div class="card-icon">
+                        <i class="fas fa-file-upload"></i>
+                    </div>
+                    <h3 class="card-title">Upload SoF Document</h3>
+                    <p class="card-description">Upload your Statement of Facts document for event extraction</p>
+                    
+                    <div class="upload-area" id="sofUploadArea">
+                        <button class="choose-file-btn" onclick="document.getElementById('sofFileInput').click()">
+                            CHOOSE SOF FILE
+                        </button>
+                        <input type="file" id="sofFileInput" accept=".pdf,.docx" style="display: none;">
+                    </div>
+                    
+                    <div class="file-status" id="sofFileStatus">
+                        <span class="status-text">No file selected</span>
+                    </div>
+                    
+                    <div class="file-info" id="sofFileInfo" style="display: none;">
+                        <div class="file-details">
+                            <i class="fas fa-file-alt"></i>
+                            <span class="file-name" id="sofFileName"></span>
+                            <button class="remove-file" onclick="removeFile('sof')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CP File Upload Card -->
+                <div class="upload-card" id="cpCard">
+                    <div class="card-icon">
+                        <i class="fas fa-file-contract"></i>
+                    </div>
+                    <h3 class="card-title">Upload CP Document</h3>
+                    <p class="card-description">Upload your Charter Party document for timeline analysis</p>
+                    
+                    <div class="upload-area" id="cpUploadArea">
+                        <button class="choose-file-btn" onclick="document.getElementById('cpFileInput').click()">
+                            CHOOSE CP FILE
+                        </button>
+                        <input type="file" id="cpFileInput" accept=".pdf,.docx" style="display: none;">
+                    </div>
+                    
+                    <div class="file-status" id="cpFileStatus">
+                        <span class="status-text">No file selected</span>
+                    </div>
+                    
+                    <div class="file-info" id="cpFileInfo" style="display: none;">
+                        <div class="file-details">
+                            <i class="fas fa-file-alt"></i>
+                            <span class="file-name" id="cpFileName"></span>
+                            <button class="remove-file" onclick="removeFile('cp')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Extract Button Section -->
+            <div class="extract-section">
+                <button class="extract-btn" id="extractBtn" onclick="uploadDocument()">
+                    <span class="btn-text">EXTRACT EVENTS & TIMELINE</span>
+                    <div class="btn-overlay"></div>
+                    <i class="fas fa-magic"></i>
+                </button>
+            </div>
+
+            <!-- Progress Section -->
+            <div class="progress-section" id="progressSection" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <p class="progress-text" id="progressText">Processing files...</p>
+            </div>
+
+            <!-- Results Section (initially hidden) -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <h3>Processing Results</h3>
+                
+                <!-- OCR Results -->
+                <div class="result-card" id="ocrResults" style="display: none;">
+                    <div class="result-header">
+                        <h4><i class="fas fa-eye"></i> OCR Results</h4>
+                        <button class="copy-btn" onclick="copyToClipboard('ocrText')">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    <div class="result-content">
+                        <textarea id="ocrText" readonly placeholder="OCR text will appear here..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Clauses Results -->
+                <div class="result-card" id="clausesResults" style="display: none;">
+                    <div class="result-header">
+                        <h4><i class="fas fa-list"></i> Extracted Clauses</h4>
+                        <button class="copy-btn" onclick="copyToClipboard('clausesText')">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    <div class="result-content">
+                        <div id="clausesList"></div>
+                    </div>
+                </div>
+
+                <!-- Summary Results -->
+                <div class="result-card" id="summaryResults" style="display: none;">
+                    <div class="result-header">
+                        <h4><i class="fas fa-file-text"></i> Document Summary</h4>
+                        <button class="copy-btn" onclick="copyToClipboard('summaryText')">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    <div class="result-content">
+                        <textarea id="summaryText" readonly placeholder="Summary will appear here..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 Cargo LayTime. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-check-circle success-icon"></i>
+                <h3>Upload Successful!</h3>
+            </div>
+            <div class="modal-body">
+                <p>Your document has been uploaded successfully. You can now process it using the buttons above.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn" onclick="closeModal()">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p id="loadingText">Processing...</p>
+        </div>
+    </div>
+
+    <script src="assets/js/dashboard.js"></script>
+</body>
+</html>

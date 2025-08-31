@@ -1,0 +1,16 @@
+# Ignore environment variables
+backend/.env
+
+# Ignore Google Cloud credentials
+backend/goog_cred.json
+*.json
+!package.json
+!package-lock.json
+!requirements.txt
+
+# Additional security
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx

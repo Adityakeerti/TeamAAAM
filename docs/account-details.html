@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Account Details • Cargo Laytime</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="assets/css/style.css" />
+	<link rel="stylesheet" href="assets/css/account-details.css" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+	<!-- Background Video -->
+	<video class="background-video" autoplay muted loop>
+		<source src="assets/images/video (1).mp4" type="video/mp4">
+		Your browser does not support the video tag.
+	</video>
+	
+	<!-- Background Overlay -->
+	<div class="background-overlay"></div>
+
+	<!-- Main Container -->
+	<main class="main-container">
+		<!-- Glassmorphism Container -->
+		<div class="glass-container account-details-container">
+			<!-- Back Button -->
+			<div class="back-button">
+				<a href="dashboard.html" class="btn btn-ghost">
+					<i class="fas fa-arrow-left"></i>
+					Back
+				</a>
+			</div>
+
+			<!-- Page Title -->
+			<div class="page-header">
+				<h1 class="main-title">Account Details</h1>
+				<p class="page-subtitle">Update your profile information and account settings</p>
+			</div>
+
+							<!-- Profile Section -->
+				<div class="profile-section">
+					<div class="profile-picture-container">
+						<div class="profile-picture" id="profilePicture">
+							<span class="profile-text">Profile</span>
+						</div>
+						<div class="edit-overlay" id="editOverlay">
+							<span>Edit</span>
+						</div>
+					</div>
+					
+					<div class="profile-name-display" id="profileNameDisplay">
+						<span>Your Name</span>
+					</div>
+				</div>
+
+			<!-- Account Details Form -->
+			<div class="account-form">
+				<form id="accountForm" onsubmit="handleSaveAccount(event)">
+					<div class="form-grid">
+						<div class="form-item">
+							<label class="form-label" for="fullName">Full Name *</label>
+							<input 
+								class="form-input" 
+								id="fullName" 
+								type="text" 
+								placeholder="Enter your full name"
+								required
+								oninput="updateProfileName(this.value)"
+							/>
+						</div>
+						
+						<div class="form-item">
+							<label class="form-label" for="email">Email Address *</label>
+							<input 
+								class="form-input" 
+								id="email" 
+								type="email" 
+								placeholder="Enter your email address"
+								required
+							/>
+						</div>
+						
+						<div class="form-item">
+							<label class="form-label" for="phone">Phone Number</label>
+							<input 
+								class="form-input" 
+								id="phone" 
+								type="tel" 
+								placeholder="Enter your phone number"
+								oninput="formatPhoneNumber(this)"
+							/>
+						</div>
+						
+						<div class="form-item">
+							<label class="form-label" for="company">Company Name</label>
+							<input 
+								class="form-input" 
+								id="company" 
+								type="text" 
+								placeholder="Enter your company name (optional)"
+							/>
+						</div>
+					</div>
+
+					<div class="form-actions">
+						<button type="submit" class="btn btn-signup save-btn" id="saveBtn">
+							<i class="fas fa-save"></i>
+							<span class="btn-text">Save Account Details</span>
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</main>
+
+	<script src="assets/js/account-details.js"></script>
+</body>
+</html>
