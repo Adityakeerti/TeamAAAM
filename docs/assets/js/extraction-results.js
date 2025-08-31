@@ -52,11 +52,7 @@ class ExtractionResults {
             input.addEventListener('change', () => this.saveFormData());
         });
 
-        // Calculate button
-        const calculateBtn = document.getElementById('calculateBtn');
-        if (calculateBtn) {
-            calculateBtn.addEventListener('click', () => this.calculateLaytime());
-        }
+
 
         // PDF file input listener
         const pdfFileInput = document.getElementById('pdfFileInput');
@@ -115,68 +111,40 @@ class ExtractionResults {
         }
     }
     
-    // Test method to manually populate form with sample data
+    // Test method to manually populate form with sample data - REMOVED HARDCODED DATA
     testFormPopulation() {
-        const testData = {
-            "vessel_info": {
-                "name_of_vessel": "IOLCOS UNITY",
-                "name_of_master": "CAPT. RZHEVSKIY OLEG",
-                "agent": "GLOBAL MARITIME SERVICES LTD",
-                "port_of_loading_cargo": "UST-LUGA",
-                "port_of_discharge": "NEW YORK",
-                "description_of_cargo": "RUSSIAN STEAM COAL IN BULK",
-                "quantity_of_cargo": "72,106.029 MT"
-            }
-        };
+        console.log('⚠ Test method called - but hardcoded data has been removed');
+        console.log('📝 Please upload a real PDF or enter data manually for testing');
         
-        console.log('Testing form population with sample data:', testData);
+        // Clear any existing test data
+        localStorage.removeItem('extractionResult');
+        console.log('🧹 Cleared any existing test data from localStorage');
         
-        // First check if all form fields exist
-        console.log('=== Checking Form Fields ===');
-        const fieldIds = ['vessel-name', 'master', 'agent', 'port-loading', 'port-discharge', 'cargo', 'quantity'];
-        fieldIds.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                console.log(`✓ Found field: ${id}`);
-            } else {
-                console.log(`✗ Missing field: ${id}`);
-            }
+        // Test time parsing with sample data
+        console.log('🧪 Testing time parsing with sample data:');
+        const testTimes = [
+            '03.08 13.00',
+            '03.08 14.00',
+            '03.08 19.30',
+            '03.08 20.30',
+            '0830',
+            '08.30',
+            '08:30'
+        ];
+        
+        testTimes.forEach(time => {
+            const parsed = this.parseDateTime(time);
+            console.log(`   "${time}" -> ${parsed ? parsed.toISOString() : 'FAILED'}`);
         });
-        console.log('=== End Form Field Check ===');
         
-        this.renderFromBackendResult(testData);
-        
-        // Also try direct population to test
-        setTimeout(() => {
-            console.log('=== Direct Form Population Test ===');
-            const directMap = {
-                'vessel-name': 'IOLCOS UNITY',
-                'master': 'CAPT. RZHEVSKIY OLEG',
-                'agent': 'GLOBAL MARITIME SERVICES LTD',
-                'port-loading': 'UST-LUGA',
-                'port-discharge': 'NEW YORK',
-                'cargo': 'RUSSIAN STEAM COAL IN BULK',
-                'quantity': '72,106.029 MT'
-            };
-            
-            Object.keys(directMap).forEach((fieldId) => {
-                const element = document.getElementById(fieldId);
-                if (element) {
-                    element.value = directMap[fieldId];
-                    console.log(`Directly set ${fieldId} to: ${directMap[fieldId]}`);
-                }
-            });
-            console.log('=== End Direct Test ===');
-        }, 1000);
-        
-        // Also store this data in localStorage for testing
-        const localStorageData = {
-            "message": "PDF successfully converted to JSON",
-            "filename": "test_data.pdf",
-            "data": testData
-        };
-        localStorage.setItem('extractionResult', JSON.stringify(localStorageData));
-        console.log('Stored test data in localStorage');
+        // Test calculation logic
+        console.log('🧮 Testing calculation logic:');
+        console.log('   Allowed laytime: 0 days (default)');
+        console.log('   Event 1: 13:00 to 14:00 = 1.0 hrs');
+        console.log('   Event 2: 14:00 to 19:30 = 5.5 hrs');
+        console.log('   Event 3: 19:30 to 20:30 = 1.0 hrs');
+        console.log('   Total consumed: 7.5 hrs');
+        console.log('   Remaining: 0 - 7.5 = -7.5 hrs (demurrage)');
     }
     
     // Clear localStorage and reload page
@@ -587,27 +555,98 @@ class ExtractionResults {
     // Populate events (handled in renderFromBackendResult now)
     populateEventsTable() { this.renderEventsTable(); }
 
-    // Parse datetime strings into Date objects
+    // Parse datetime strings into Date objects with comprehensive regex parsing
     parseDateTime(dateTimeStr) {
         if (!dateTimeStr || dateTimeStr === '-') return null;
         
         try {
-            // Handle various date/time formats
             let cleanStr = dateTimeStr.trim();
+            console.log(`🔍 Parsing datetime: "${dateTimeStr}"`);
             
-            // If it's just a time (HH.MM or HH:MM), assume today's date
-            if (/^\d{1,2}[:.]\d{2}$/.test(cleanStr)) {
-                const today = new Date().toDateString();
-                cleanStr = `${today} ${cleanStr.replace('.', ':')}`;
+            // Handle various time formats with regex
+            // Format: "03.08 13.00" or "03.08 13:00" or "03.08 1300"
+            const timeFormatRegex = /(\d{1,2})\.(\d{1,2})\s+(\d{1,2})[.:]?(\d{2})/;
+            const timeMatch = cleanStr.match(timeFormatRegex);
+            
+            if (timeMatch) {
+                const day = timeMatch[1];
+                const month = timeMatch[2];
+                const hour = timeMatch[3];
+                const minute = timeMatch[4];
+                
+                // Assume current year for calculations
+                const currentYear = new Date().getFullYear();
+                const dateStr = `${currentYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${hour.padStart(2, '0')}:${minute.padStart(2, '0')}:00`;
+                
+                const parsedDate = new Date(dateStr);
+                if (!isNaN(parsedDate.getTime())) {
+                    console.log(`✓ Parsed with time format regex: ${parsedDate} (${day}.${month} ${hour}:${minute})`);
+                    return parsedDate;
+                }
             }
             
-            // Replace dots with colons in time part
-            cleanStr = cleanStr.replace(/(\d{1,2})\.(\d{2})/, '$1:$2');
+            // Handle format: "0830" -> "08:30"
+            const compactTimeRegex = /^(\d{1,2})(\d{2})$/;
+            const compactMatch = cleanStr.match(compactTimeRegex);
             
-            const date = new Date(cleanStr);
-            return isNaN(date.getTime()) ? null : date;
+            if (compactMatch) {
+                const hour = compactMatch[1];
+                const minute = compactMatch[2];
+                const today = new Date();
+                const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}T${hour.padStart(2, '0')}:${minute.padStart(2, '0')}:00`;
+                
+                const parsedDate = new Date(dateStr);
+                if (!isNaN(parsedDate.getTime())) {
+                    console.log(`✓ Parsed compact time: ${parsedDate} (${hour}:${minute})`);
+                    return parsedDate;
+                }
+            }
+            
+            // Handle format: "08.30" -> "08:30"
+            const dotTimeRegex = /^(\d{1,2})\.(\d{2})$/;
+            const dotMatch = cleanStr.match(dotTimeRegex);
+            
+            if (dotMatch) {
+                const hour = dotMatch[1];
+                const minute = dotMatch[2];
+                const today = new Date();
+                const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}T${hour.padStart(2, '0')}:${minute.padStart(2, '0')}:00`;
+                
+                const parsedDate = new Date(dateStr);
+                if (!isNaN(parsedDate.getTime())) {
+                    console.log(`✓ Parsed dot time: ${parsedDate} (${hour}:${minute})`);
+                    return parsedDate;
+                }
+            }
+            
+            // Handle format: "08:30" -> "08:30"
+            const colonTimeRegex = /^(\d{1,2}):(\d{2})$/;
+            const colonMatch = cleanStr.match(colonTimeRegex);
+            
+            if (colonMatch) {
+                const hour = colonMatch[1];
+                const minute = colonMatch[2];
+                const today = new Date();
+                const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}T${hour.padStart(2, '0')}:${minute.padStart(2, '0')}:00`;
+                
+                const parsedDate = new Date(dateStr);
+                if (!isNaN(parsedDate.getTime())) {
+                    console.log(`✓ Parsed colon time: ${parsedDate} (${hour}:${minute})`);
+                    return parsedDate;
+                }
+            }
+            
+            // First attempt: Use Date.parse() for standard formats
+            const parsedDate = new Date(cleanStr);
+            if (!isNaN(parsedDate.getTime())) {
+                console.log(`✓ Parsed with Date.parse(): ${parsedDate}`);
+                return parsedDate;
+            }
+            
+            console.log(`✗ Failed to parse: "${dateTimeStr}"`);
+            return null;
         } catch (e) {
-            console.warn('Failed to parse datetime:', dateTimeStr);
+            console.warn('Failed to parse datetime:', dateTimeStr, e);
             return null;
         }
     }
@@ -617,30 +656,36 @@ class ExtractionResults {
         const startDate = this.parseDateTime(startStr);
         const endDate = this.parseDateTime(endStr);
         
-        if (!startDate || !endDate) return 0;
+        if (!startDate || !endDate) {
+            console.log(`✗ Cannot calculate difference: start=${startStr}, end=${endStr}`);
+            return 0;
+        }
         
         let diffMs = endDate.getTime() - startDate.getTime();
         
         // If end time is earlier than start time, assume it's the next day
         if (diffMs < 0) {
             diffMs += 24 * 60 * 60 * 1000; // Add 24 hours in milliseconds
+            console.log(`⚠ End time before start time, assuming next day`);
         }
         
-        return diffMs / (1000 * 60 * 60); // Convert to hours
+        const hours = diffMs / (1000 * 60 * 60); // Convert to hours
+        console.log(`✓ Time difference: ${startStr} to ${endStr} = ${hours.toFixed(2)} hours`);
+        return hours;
     }
 
-    // Format hours to days and hours display
+    // Format hours to days and hours display (enhanced format)
     formatHoursToDaysHours(hours) {
-        if (hours === 0) return '0.00h';
+        if (hours === 0) return '0.0 hrs';
         
-        const days = Math.floor(hours / 24);
-        const remainingHours = hours % 24;
+        return `${hours.toFixed(1)} hrs`;
+    }
+
+    // Format remaining time in hours with color indication
+    formatRemainingTime(hours) {
+        if (hours === 0) return '0.0 hrs';
         
-        if (days > 0) {
-            return `${days}d ${remainingHours.toFixed(2)}h`;
-        } else {
-            return `${remainingHours.toFixed(2)}h`;
-        }
+        return `${hours.toFixed(1)} hrs`;
     }
 
     // Calculate laytime utilization and remaining for each event
@@ -648,15 +693,24 @@ class ExtractionResults {
         const allowedLaytimeDays = parseFloat(document.getElementById('allowed-laytime')?.value || 0);
         const allowedLaytimeHours = allowedLaytimeDays * 24;
         
+        console.log(`📊 Calculating laytime metrics: allowed=${allowedLaytimeDays} days (${allowedLaytimeHours} hrs)`);
+        
         let cumulativeConsumed = 0;
         
-        return this.events.map((event, index) => {
-            // Calculate utilization for this event
+        const result = this.events.map((event, index) => {
+            // Calculate utilization for this event (simple end time - start time)
             const utilizationHours = this.calculateHoursDifference(event.startDateTime, event.endDateTime);
             cumulativeConsumed += utilizationHours;
             
-            // Calculate remaining laytime
+            // Calculate remaining laytime in hours
+            // If no allowed laytime set, use 0 as default (assume no laytime allowed)
             const remainingHours = allowedLaytimeHours - cumulativeConsumed;
+            
+            console.log(`📅 Event ${index + 1}: ${event.events}`);
+            console.log(`   Start: ${event.startDateTime}, End: ${event.endDateTime}`);
+            console.log(`   Utilization: ${utilizationHours.toFixed(2)} hrs (end - start)`);
+            console.log(`   Cumulative: ${cumulativeConsumed.toFixed(2)} hrs`);
+            console.log(`   Remaining: ${remainingHours.toFixed(2)} hrs`);
             
             return {
                 ...event,
@@ -665,6 +719,9 @@ class ExtractionResults {
                 cumulativeConsumed
             };
         });
+        
+        console.log(`📊 Final metrics calculated for ${result.length} events`);
+        return result;
     }
 
     // Calculate time difference between start and end times (keeping original for compatibility)
@@ -740,13 +797,27 @@ class ExtractionResults {
 
         eventsWithMetrics.forEach((event, index) => {
             const row = document.createElement('tr');
+            
+            // Format remaining time with color indication
+            const remainingTimeFormatted = this.formatRemainingTime(event.remainingHours);
+            
+            // Simple logic: 0 = on time, +ve = early, -ve = late
+            let remainingTimeCell;
+            if (event.remainingHours === 0) {
+                remainingTimeCell = `<span style="color: #10b981;">${remainingTimeFormatted}</span>`; // Green for on time
+            } else if (event.remainingHours > 0) {
+                remainingTimeCell = `<span style="color: #3b82f6;">${remainingTimeFormatted}</span>`; // Blue for early (dispatch)
+            } else {
+                remainingTimeCell = `<span style="color: #ef4444;">${remainingTimeFormatted}</span>`; // Red for late (demurrage)
+            }
+            
             row.innerHTML = `
                 <td>${event.events || ''}</td>
                 <td>${event.day || ''}</td>
                 <td>${event.startDateTime || ''}</td>
                 <td>${event.endDateTime || ''}</td>
                 <td>${this.formatHoursToDaysHours(event.utilizationHours)}</td>
-                <td>${this.formatHoursToDaysHours(event.remainingHours)}</td>
+                <td>${remainingTimeCell}</td>
                 <td>
                     <button class="btn btn-sm btn-secondary" onclick="editEvent(${index})" title="Edit Event">
                         <i class="fas fa-edit"></i>
@@ -781,8 +852,8 @@ class ExtractionResults {
             <th>DAY</th>
             <th>START DATE TIME</th>
             <th>END DATE TIME</th>
-            <th>LAYTIME UTILIZATION</th>
-            <th>LAYTIME REMAINING</th>
+            <th>LAYTIME UTILIZATION (hrs)</th>
+            <th>LAYTIME REMAINING (hrs)</th>
             <th>ACTIONS</th>
         `;
     }
@@ -810,13 +881,15 @@ class ExtractionResults {
         }
         
         if (laytimeRemainingElement) {
-            laytimeRemainingElement.textContent = this.formatHoursToDaysHours(Math.abs(totalRemainingHours));
+            // Simple logic: 0 = on time, +ve = early, -ve = late
+            laytimeRemainingElement.textContent = this.formatRemainingTime(Math.abs(totalRemainingHours));
             
-            // Change color based on demurrage/dispatch
-            if (totalRemainingHours < 0) {
-                laytimeRemainingElement.style.color = '#ef4444'; // Red for demurrage
+            if (totalRemainingHours === 0) {
+                laytimeRemainingElement.style.color = '#10b981'; // Green for on time
+            } else if (totalRemainingHours > 0) {
+                laytimeRemainingElement.style.color = '#3b82f6'; // Blue for early (dispatch)
             } else {
-                laytimeRemainingElement.style.color = '#10b981'; // Green for dispatch
+                laytimeRemainingElement.style.color = '#ef4444'; // Red for late (demurrage)
             }
         }
         
@@ -826,13 +899,13 @@ class ExtractionResults {
         
         if (demurrageCostElement && dispatchCreditElement) {
             if (totalRemainingHours < 0) {
-                // Demurrage situation
+                // Demurrage situation (stayed longer)
                 const demurrageDays = Math.abs(totalRemainingHours) / 24;
                 const demurrageCost = demurrageDays * demurrageRate;
                 demurrageCostElement.textContent = `${demurrageCost.toFixed(2)}`;
                 dispatchCreditElement.textContent = '$0.00';
             } else if (totalRemainingHours > 0) {
-                // Dispatch situation
+                // Dispatch situation (left early)
                 const dispatchDays = totalRemainingHours / 24;
                 const dispatchCredit = dispatchDays * dispatchRate;
                 demurrageCostElement.textContent = '$0.00';
@@ -860,39 +933,7 @@ class ExtractionResults {
         });
     }
 
-    // Calculate laytime
-    calculateLaytime() {
-        console.log('Calculate laytime function called');
-        
-        // Collect all form data
-        const formData = {
-            vesselName: document.getElementById('vessel-name').value,
-            master: document.getElementById('master').value,
-            agent: document.getElementById('agent').value,
-            portLoading: document.getElementById('port-loading').value,
-            portDischarge: document.getElementById('port-discharge').value,
-            cargo: document.getElementById('cargo').value,
-            quantity: document.getElementById('quantity').value,
-            allowedLaytime: document.getElementById('allowed-laytime').value,
-            demurrage: document.getElementById('demurrage').value,
-            dispatch: document.getElementById('dispatch').value,
-            rate: document.getElementById('rate').value || '' // No hardcoded default
-        };
 
-        console.log('Form data collected:', formData);
-        console.log('Events data:', this.events);
-
-        // Save form data to localStorage for the calculate page
-        localStorage.setItem('calculateFormData', JSON.stringify(formData));
-        
-        // Save events data for calculation
-        localStorage.setItem('calculateEvents', JSON.stringify(this.events));
-
-        console.log('Data saved to localStorage, redirecting to calculate.html');
-        
-        // Redirect to calculate page
-        window.location.href = 'calculate.html';
-    }
 
     // Save form data
     saveFormData() {
@@ -1124,10 +1165,7 @@ function deleteEvent(index) {
     }
 }
 
-// Calculate laytime
-function calculateLaytime() {
-    extractionResults.calculateLaytime();
-}
+
 
 // Recalculate time utilizations
 function recalculateTimeUtilizations() {
@@ -1138,7 +1176,7 @@ function recalculateTimeUtilizations() {
 
 // Show help
 function showHelp() {
-    alert('Help: This page allows you to review extracted SOF data, edit vessel details, manage events timeline, and calculate laytime costs.');
+    alert('Help: This page allows you to review extracted SOF data, edit vessel details, and manage events timeline.');
 }
 
 // Global functions for PDF processing
