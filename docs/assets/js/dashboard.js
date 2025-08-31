@@ -1,7 +1,7 @@
 // Dashboard JavaScript with FastAPI Integration
 class DashboardAPI {
     constructor() {
-        this.baseURL = 'https://teamaaam.onrender.com';
+        this.baseURL = 'http://localhost:8000';
         this.currentDocumentId = null;
         this.currentFile = null;
         this.init();
@@ -256,16 +256,7 @@ class DashboardAPI {
             }, 800);
         } catch (error) {
             console.error('Upload error:', error);
-            
-            // Better error handling for CORS and network issues
-            let errorMessage = error.message;
-            if (error.message === 'Failed to fetch') {
-                errorMessage = 'Network error: Cannot connect to backend. This might be a CORS issue or the backend is down.';
-            } else if (error.message.includes('CORS')) {
-                errorMessage = 'CORS error: Frontend cannot communicate with backend. Please check backend configuration.';
-            }
-            
-            this.showMessage(`Upload failed: ${errorMessage}`, 'error');
+            this.showMessage(`Upload failed: ${error.message}`, 'error');
         } finally {
             this.hideLoading();
         }

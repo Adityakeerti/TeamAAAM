@@ -92,7 +92,7 @@
 			resultDiv.textContent = 'Testing connection...';
 			
 			try {
-				const API_BASE = 'https://teamaaam.onrender.com';
+				const API_BASE = 'http://localhost:8000';
 				console.log('Testing connection to:', API_BASE);
 				
 				const response = await fetch(`${API_BASE}/health`);
@@ -125,7 +125,7 @@
 			resultDiv.textContent = 'Uploading file...';
 			
 			try {
-				const API_BASE = 'https://teamaaam.onrender.com';
+				const API_BASE = 'http://localhost:8000';
 				console.log('Uploading file:', file.name, 'Size:', file.size, 'bytes');
 				
 				const formData = new FormData();

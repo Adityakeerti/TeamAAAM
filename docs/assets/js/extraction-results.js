@@ -1,7 +1,7 @@
 // Extraction Results JavaScript - Complete SOF Processing Workflow
 class ExtractionResults {
     constructor() {
-        this.baseURL = 'https://teamaaam.onrender.com'; // Render backend
+        this.baseURL = 'http://localhost:8000'; // Local FastAPI backend
         this.documentId = null;
         this.vesselData = {};
         this.events = [];

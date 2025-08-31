@@ -10,8 +10,8 @@ google-cloud-documentai==2.27.0
 google-generativeai==0.7.1
 
 # AI & Machine Learning
-transformers>=4.42.3
-torch>=2.0.0
+transformers==4.42.3
+torch==2.3.1
 sentencepiece==0.2.0
 
 # PDF Processing

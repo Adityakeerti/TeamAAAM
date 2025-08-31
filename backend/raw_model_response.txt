@@ -1,155 +1,204 @@
 ```json
 {
   "header": {
-    "document_title": "STANDARD STATEMENT OF PACTS SHORT FORM"
+    "document_title": "STATEMENT OF FACTS"
   },
   "vessel_info": {
-    "name_of_vessel": "IOLCOS UNITY",
-    "name_of_master": "CAPT. RZHEVSKIY OLEG",
-    "port_of_loading_cargo": "UST-LUGA",
-    "description_of_cargo": "RUSSIAN STEAM COAL IN BULK",
-    "quantity_of_cargo": "72 106,029 MT"
+    "name_of_vessel": "MV ELEEN NEPTUNE",
+    "name_of_master": "N/A",
+    "port_of_loading_cargo": "GOPALPUR, INDIA",
+    "description_of_cargo": "IRON ORE FINES IN BULK",
+    "quantity_of_cargo": "53,420.000 WMT"
   },
   "events": [
     {
-      "event": "Arrived to Russian border, dropped anchor at international waters, NOR tendered",
-      "day": "Tuesday",
-      "start_date": "30.07",
-      "start_time": "23.00",
-      "end_time": "23.00"
+      "event": "VESSEL ARRIVED AT GOPALPUR PORT",
+      "day": "THURSDAY",
+      "start_date": "22.02.2024",
+      "start_time": "1925",
+      "end_time": "N/A"
     },
     {
-      "event": "Awaiting berthing instructions",
-      "day": "Tuesday",
-      "start_date": "30.07",
-      "start_time": "23.00",
-      "end_time": "24.00"
+      "event": "NOTICE OF READINESS TENDERED",
+      "day": "THURSDAY",
+      "start_date": "22.02.2024",
+      "start_time": "1925",
+      "end_time": "N/A"
     },
     {
-      "event": "Awaiting berthing instructions",
-      "day": "Wednesday",
-      "start_date": "31.07",
-      "start_time": "00.00",
-      "end_time": "24.00"
+      "event": "NOTICE OF READINESS ACCEPTED",
+      "day": "N/A",
+      "start_date": "23.02.2024",
+      "start_time": "1504",
+      "end_time": "N/A"
     },
     {
-      "event": "Awaiting berthing instructions",
-      "day": "Thursday",
-      "start_date": "01.08",
-      "start_time": "00.00",
-      "end_time": "24.00"
+      "event": "VESSEL DROP ANCHOR",
+      "day": "THURSDAY",
+      "start_date": "22.02.2024",
+      "start_time": "2040",
+      "end_time": "N/A"
     },
     {
-      "event": "Awaiting berthing instructions",
-      "day": "Friday",
-      "start_date": "02.08",
-      "start_time": "00.00",
-      "end_time": "16.20"
+      "event": "VESSEL HEAVED UP ANCHOR",
+      "day": "FRIDAY",
+      "start_date": "23.02.2024",
+      "start_time": "1750",
+      "end_time": "N/A"
     },
     {
-      "event": "Passage to the Ust-Luga pilot station",
-      "day": "Friday",
-      "start_date": "02.08",
-      "start_time": "16.20",
-      "end_time": "24.00"
+      "event": "PILOT BOARDED FOR BERTHING",
+      "day": "FRIDAY",
+      "start_date": "23.02.2024",
+      "start_time": "1815",
+      "end_time": "N/A"
     },
     {
-      "event": "Passage to the Ust-Luga pilot station",
-      "day": "Saturday",
-      "start_date": "03.08",
-      "start_time": "00.00",
-      "end_time": "01.00"
+      "event": "VESSEL FIRST LINE ASHORE AT BERTH NO -3",
+      "day": "FRIDAY",
+      "start_date": "23.02.2024",
+      "start_time": "1854",
+      "end_time": "N/A"
     },
     {
-      "event": "Arrived pist",
-      "day": "Saturday",
-      "start_date": "03.08",
-      "start_time": "01.00",
-      "end_time": "01.00"
+      "event": "VESSEL ALL MADE FAST AT BERTH NO - 3",
+      "day": "FRIDAY",
+      "start_date": "23.02.2024",
+      "start_time": "1915",
+      "end_time": "N/A"
     },
     {
-      "event": "P.O.B. Pilotage to load berth",
-      "day": "Saturday",
-      "start_date": "03.08",
-      "start_time": "01.00",
-      "end_time": "03.18"
+      "event": "PILOT DISEMBARKED",
+      "day": "FRIDAY",
+      "start_date": "23.02.2024",
+      "start_time": "1930",
+      "end_time": "N/A"
     },
     {
-      "event": "First line ashore, mooring ops, all fest, NOR re-tendered",
-      "day": "Saturday",
-      "start_date": "03.08",
-      "start_time": "03.18",
-      "end_time": "04.00"
+      "event": "GANG-WAY DOWN",
+      "day": "FRIDAY",
+      "start_date": "23.02.2024",
+      "start_time": "1930",
+      "end_time": "N/A"
     },
     {
-      "event": "Accommodation ladder rigging",
-      "day": "Saturday",
-      "start_date": "03.08",
-      "start_time": "04.00",
-      "end_time": "04.10"
+      "event": "CUSTOMS BOARDED",
+      "day": "FRIDAY",
+      "start_date": "23.02.2024",
+      "start_time": "1930",
+      "end_time": "N/A"
     },
     {
-      "event": "Awaiting Authorities release",
-      "day": "Saturday",
-      "start_date": "03.08",
-      "start_time": "04.10",
-      "end_time": "06.30"
+      "event": "INITIAL DRAFT SURVEY COMMENCED",
+      "day": "FRIDAY",
+      "start_date": "23.02.2024",
+      "start_time": "1930",
+      "end_time": "N/A"
     },
     {
-      "event": "Inward clearance",
-      "day": "Saturday",
-      "start_date": "03.08",
-      "start_time": "06.30",
-      "end_time": "07.45"
+      "event": "INITIAL DRAFT SURVEY COMPLETED",
+      "day": "FRIDAY",
+      "start_date": "23.02.2024",
+      "start_time": "2030",
+      "end_time": "N/A"
     },
     {
-      "event": "Initial draft-survey, holds acceptance",
-      "day": "Saturday",
-      "start_date": "03.08",
-      "start_time": "07.45",
-      "end_time": "09.00"
+      "event": "CUSTOMS CLEARANCE GRANTED",
+      "day": "FRIDAY",
+      "start_date": "23.02.2024",
+      "start_time": "2030",
+      "end_time": "N/A"
     },
     {
-      "event": "Loading commenced",
-      "day": "Saturday",
-      "start_date": "03.08",
-      "start_time": "09.00",
-      "end_time": "09.00"
+      "event": "HATCH COVER OPEN & GRAB CONNECTION COMMENCED",
+      "day": "FRIDAY",
+      "start_date": "23.02.2024",
+      "start_time": "2030",
+      "end_time": "N/A"
     },
     {
-      "event": "Loading",
-      "day": "Saturday",
-      "start_date": "03.08",
-      "start_time": "09.00",
-      "end_time": "13.00"
+      "event": "HATCH COVER OPEN & GRAB CONNECTION COMPLETED",
+      "day": "FRIDAY",
+      "start_date": "23.02.2024",
+      "start_time": "2200",
+      "end_time": "N/A"
     },
     {
-      "event": "Stevedore's meal break",
-      "day": "Saturday",
-      "start_date": "03.08",
-      "start_time": "13.00",
-      "end_time": "14.00"
+      "event": "HATCH INSPECTION COMMENCED",
+      "day": "FRIDAY",
+      "start_date": "23.02.2024",
+      "start_time": "2200",
+      "end_time": "N/A"
     },
     {
-      "event": "Loading",
-      "day": "Saturday",
-      "start_date": "03.08",
-      "start_time": "14.00",
-      "end_time": "19.30"
+      "event": "HATCH INSPECTION COMPLETED",
+      "day": "FRIDAY",
+      "start_date": "23.02.2024",
+      "start_time": "2300",
+      "end_time": "N/A"
     },
     {
-      "event": "Stevedores shift change",
-      "day": "Saturday",
-      "start_date": "03.08",
-      "start_time": "19.30",
-      "end_time": "20.30"
+      "event": "LOADING COMMENCED",
+      "day": "SATURDAY",
+      "start_date": "24.02.2024",
+      "start_time": "0800",
+      "end_time": "N/A"
     },
     {
-      "event": "Loading",
-      "day": "Saturday",
-      "start_date": "03.08",
-      "start_time": "20.30",
-      "end_time": "24.00"
+      "event": "LOADING COMPLETED",
+      "day": "SUNDAY",
+      "start_date": "25.02.2024",
+      "start_time": "N/A",
+      "end_time": "N/A"
+    },
+    {
+      "event": "FINIAL DRAFT SURVEY COMMENCED",
+      "day": "SUNDAY",
+      "start_date": "25.02.2024",
+      "start_time": "N/A",
+      "end_time": "N/A"
+    },
+    {
+      "event": "FINAL DRAFT SURVEY COMPLETED",
+      "day": "SUNDAY",
+      "start_date": "25.02.2024",
+      "start_time": "N/A",
+      "end_time": "N/A"
+    },
+    {
+      "event": "DOCUMENTATION COMPLETED",
+      "day": "SUNDAY",
+      "start_date": "25.02.2024",
+      "start_time": "N/A",
+      "end_time": "N/A"
+    },
+    {
+      "event": "VESSEL READY TO SAIL",
+      "day": "SUNDAY",
+      "start_date": "25.02.2024",
+      "start_time": "N/A",
+      "end_time": "N/A"
+    },
+    {
+      "event": "PILOT BOARDED FOR SAILING",
+      "day": "SUNDAY",
+      "start_date": "25.02.2024",
+      "start_time": "N/A",
+      "end_time": "N/A"
+    },
+    {
+      "event": "VESSEL ALL CAST OFF",
+      "day": "SUNDAY",
+      "start_date": "25.02.2024",
+      "start_time": "N/A",
+      "end_time": "N/A"
+    },
+    {
+      "event": "PILOT DISEMBARKED",
+      "day": "SUNDAY",
+      "start_date": "25.02.2024",
+      "start_time": "N/A",
+      "end_time": "N/A"
     }
   ]
 }
