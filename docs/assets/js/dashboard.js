@@ -1,7 +1,7 @@
 // Dashboard JavaScript with FastAPI Integration
 class DashboardAPI {
     constructor() {
-        this.baseURL = 'http://localhost:8000';
+        this.baseURL = 'https://teamaaam.onrender.com';
         this.currentDocumentId = null;
         this.currentFile = null;
         this.init();
