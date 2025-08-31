@@ -16,7 +16,13 @@ app = FastAPI(title="PDF OCR & JSON Converter API", version="1.0.0")
 # Add CORS middleware to allow frontend requests
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure this properly in production
+    allow_origins=[
+        "*",  # Allow all origins for development
+        "https://adityakeerti.github.io",  # Your GitHub Pages frontend
+        "https://teamaaam.onrender.com",   # Your Render backend
+        "http://localhost:3000",           # Local development
+        "http://localhost:8080",           # Local development
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -42,6 +48,23 @@ latest_extraction_results = None
 @app.get("/")
 async def root():
     return {"message": "PDF OCR & JSON Converter API", "status": "running"}
+
+@app.get("/health")
+async def health_check():
+    """
+    Health check endpoint for monitoring and testing
+    """
+    return {
+        "status": "healthy",
+        "timestamp": datetime.now().isoformat(),
+        "version": "1.0.0",
+        "backend": "Render",
+        "cors_enabled": True,
+        "allowed_origins": [
+            "https://adityakeerti.github.io",
+            "https://teamaaam.onrender.com"
+        ]
+    }
 
 @app.post("/extract")
 async def extract_pdf(pdf: UploadFile = File(..., alias="pdf")):

@@ -256,7 +256,16 @@ class DashboardAPI {
             }, 800);
         } catch (error) {
             console.error('Upload error:', error);
-            this.showMessage(`Upload failed: ${error.message}`, 'error');
+            
+            // Better error handling for CORS and network issues
+            let errorMessage = error.message;
+            if (error.message === 'Failed to fetch') {
+                errorMessage = 'Network error: Cannot connect to backend. This might be a CORS issue or the backend is down.';
+            } else if (error.message.includes('CORS')) {
+                errorMessage = 'CORS error: Frontend cannot communicate with backend. Please check backend configuration.';
+            }
+            
+            this.showMessage(`Upload failed: ${errorMessage}`, 'error');
         } finally {
             this.hideLoading();
         }
