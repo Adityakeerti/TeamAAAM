@@ -10,6 +10,7 @@ A comprehensive maritime document processing system that extracts data from Stat
 - [Project Structure](#project-structure)
 - [Prerequisites](#prerequisites)
 - [Local Setup](#local-setup)
+- [Hosting & Deployment](#hosting--deployment)
 - [Usage](#usage)
 - [API Endpoints](#api-endpoints)
 - [Configuration](#configuration)
@@ -33,7 +34,7 @@ Cargo Laytime is a sophisticated web application designed for maritime professio
 
 ### 🔍 Document Processing
 - **PDF Upload & Processing**: Support for various PDF formats
-- **OCR Integration**: Google Cloud Vision API for text extraction
+- **OCR Integration**: Google Cloud Document AI for text extraction
 - **AI-Powered Parsing**: Google Generative AI for intelligent data extraction
 - **Multi-format Support**: Handles various SOF document layouts
 
@@ -61,10 +62,8 @@ Cargo Laytime is a sophisticated web application designed for maritime professio
 - **Python 3.8+**: Core application logic
 - **FastAPI**: High-performance web framework
 - **Uvicorn**: ASGI server for production deployment
-- **Google Cloud APIs**: Vision, Document AI, Generative AI
-- **PyPDF2**: PDF text extraction
-- **Pillow**: Image processing
-- **Transformers**: AI model integration
+- **Google Cloud APIs**: Document AI, Storage, Generative AI
+- **Python Standard Library**: Built-in modules for file handling and utilities
 
 ### Frontend
 - **HTML5**: Semantic markup structure
@@ -81,15 +80,17 @@ Cargo Laytime is a sophisticated web application designed for maritime professio
 ## 📁 Project Structure
 
 ```
-cargo-laytime/
+Marithon_New/
 ├── backend/                          # Python backend application
 │   ├── main.py                      # FastAPI application entry point
-│   ├── OCR_Script.py                # OCR processing logic
-│   ├── parser_script.py             # Document parsing utilities
-│   ├── requirements.txt             # Python dependencies
+│   ├── OCR_Script.py                # OCR processing logic using Google Document AI
+│   ├── parser_script.py             # Document parsing utilities with Google Generative AI
+│   ├── requirements.txt             # Python dependencies (cleaned)
 │   ├── setup.py                     # Package installation script
 │   ├── goog_cred.json              # Google Cloud credentials
-│   └── render.yaml                  # Deployment configuration
+│   ├── env.example                  # Environment variables template
+│   ├── render.yaml                  # Deployment configuration
+│   └── procfile                     # Heroku deployment configuration
 ├── docs/                            # Frontend web application
 │   ├── index.html                   # Landing page
 │   ├── login.html                   # Authentication page
@@ -98,11 +99,12 @@ cargo-laytime/
 │   ├── extraction-results.html      # SOF processing results
 │   ├── calculate.html               # Laytime calculation page
 │   ├── account-details.html         # User profile management
+│   ├── test-upload.html             # PDF upload testing page
 │   ├── assets/                      # Static assets
 │   │   ├── css/                     # Stylesheets
 │   │   ├── js/                      # JavaScript files
 │   │   └── images/                  # Images and media
-│   └── sample/                      # Sample SOF documents
+│   └── sample/                      # Sample SOF documents for testing
 └── README.md                        # Project documentation
 ```
 
@@ -112,14 +114,13 @@ Before setting up the project, ensure you have the following:
 
 ### System Requirements
 - **Python 3.8 or higher**
-- **Node.js 14+** (for frontend development tools)
 - **Git** for version control
 - **Modern web browser** (Chrome, Firefox, Safari, Edge)
 
 ### Google Cloud Services
 - **Google Cloud Project** with billing enabled
-- **Google Cloud Vision API** enabled
 - **Google Cloud Document AI API** enabled
+- **Google Cloud Storage API** enabled
 - **Google Generative AI API** enabled
 - **Service Account** with appropriate permissions
 - **JSON credentials file** downloaded
@@ -137,7 +138,7 @@ Follow these steps to set up the project on your local machine:
 
 ```bash
 git clone <repository-url>
-cd cargo-laytime
+cd Marithon_New
 ```
 
 ### 2. Backend Setup
@@ -203,9 +204,263 @@ The frontend will be available at `http://localhost:8080`
 
 ### 4. Verify Installation
 
-1. **Backend Health Check**: Visit `http://localhost:8000/docs` for FastAPI documentation
+1. **Backend Health Check**: Visit `http://localhost:8000/health` for backend status
 2. **Frontend Access**: Open `http://localhost:8080` in your browser
 3. **API Connection**: Ensure the frontend can connect to the backend at port 8000
+
+## ☁️ Hosting & Deployment
+
+This project is configured for multiple hosting platforms. Choose the option that best fits your needs:
+
+### 🚀 Render (Recommended - Free Tier Available)
+
+**Current Configuration**: The project is pre-configured for Render deployment.
+
+#### Quick Deploy to Render
+
+1. **Fork/Clone** this repository to your GitHub account
+2. **Sign up** for a free Render account at [render.com](https://render.com)
+3. **Connect** your GitHub repository
+4. **Create New Web Service**:
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+   - **Environment**: Python 3.9.16
+
+#### Render Configuration Files
+
+**`backend/render.yaml`** (Current Configuration):
+```yaml
+services:
+  - type: web
+    name: cargo-laytime-backend
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.16
+```
+
+#### Required Environment Variables on Render
+
+Set these in your Render dashboard:
+
+```env
+# Google Cloud Configuration
+GOOGLE_APPLICATION_CREDENTIALS=goog_cred.json
+GOOGLE_CLOUD_PROJECT=your-project-id
+
+# Render-specific
+PYTHON_VERSION=3.9.16
+PORT=10000
+
+# Security
+SECRET_KEY=your-secret-key-here
+ALLOWED_ORIGINS=https://your-app-name.onrender.com
+```
+
+### 🎯 Heroku Deployment
+
+**Current Configuration**: The project includes Heroku configuration files.
+
+#### Deploy to Heroku
+
+1. **Install Heroku CLI** and login:
+```bash
+heroku login
+```
+
+2. **Create Heroku app**:
+```bash
+heroku create your-app-name
+```
+
+3. **Set buildpacks**:
+```bash
+heroku buildpacks:set heroku/python
+```
+
+4. **Configure environment variables**:
+```bash
+heroku config:set GOOGLE_APPLICATION_CREDENTIALS=goog_cred.json
+heroku config:set GOOGLE_CLOUD_PROJECT=your-project-id
+heroku config:set SECRET_KEY=your-secret-key-here
+```
+
+5. **Deploy**:
+```bash
+git push heroku main
+```
+
+#### Heroku Configuration Files
+
+**`backend/procfile`** (Current Configuration):
+```
+web: uvicorn main:app --host 0.0.0.0 --port $PORT
+```
+
+### 🌐 Railway Deployment
+
+Railway offers a simple alternative to Heroku:
+
+1. **Sign up** at [railway.app](https://railway.app)
+2. **Connect** your GitHub repository
+3. **Deploy** automatically with the existing configuration
+
+### 🔧 Vercel Deployment (Frontend Only)
+
+For static frontend hosting:
+
+1. **Install Vercel CLI**:
+```bash
+npm i -g vercel
+```
+
+2. **Deploy frontend**:
+```bash
+cd docs
+vercel
+```
+
+### 🐳 Docker Deployment
+
+#### Dockerfile (Create if needed)
+
+```dockerfile
+FROM python:3.9-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY . .
+
+EXPOSE 8000
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+#### Docker Compose
+
+```yaml
+version: '3.8'
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/goog_cred.json
+    volumes:
+      - ./backend/goog_cred.json:/app/goog_cred.json
+```
+
+### 📱 Production Considerations
+
+#### Environment Variables
+
+Create a production `.env` file:
+
+```env
+# Production Configuration
+DEBUG_MODE=false
+LOG_LEVEL=INFO
+ALLOWED_ORIGINS=https://your-domain.com
+
+# Google Cloud (Production)
+GOOGLE_CLOUD_PROJECT=your-production-project
+GOOGLE_APPLICATION_CREDENTIALS=production-credentials.json
+
+# Security
+SECRET_KEY=your-production-secret-key
+CORS_ORIGINS=https://your-domain.com
+```
+
+#### SSL/HTTPS
+
+- **Render**: Automatic SSL with custom domains
+- **Heroku**: Automatic SSL with custom domains
+- **Custom Domain**: Configure SSL certificates
+
+#### Monitoring & Logging
+
+```python
+# Add to main.py for production logging
+import logging
+from fastapi.middleware.cors import CORSMiddleware
+
+# Production logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+
+# Production CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://your-domain.com"],
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
+```
+
+### 🔄 Deployment Workflow
+
+#### Automated Deployment
+
+1. **Push to main branch** triggers automatic deployment
+2. **Environment variables** are managed through hosting platform
+3. **Health checks** ensure successful deployment
+4. **Rollback** available if deployment fails
+
+#### Manual Deployment
+
+```bash
+# Build and test locally
+cd backend
+pip install -r requirements.txt
+python -m pytest
+
+# Deploy to production
+git push origin main
+# Or use hosting platform CLI
+render deploy
+# Or
+heroku git:remote -a your-app-name
+git push heroku main
+```
+
+### 📊 Performance Optimization
+
+#### Production Settings
+
+```python
+# In main.py
+if not DEBUG_MODE:
+    # Production optimizations
+    app = FastAPI(
+        title="Cargo Laytime API",
+        version="1.0.0",
+        docs_url=None,  # Disable docs in production
+        redoc_url=None
+    )
+```
+
+#### Caching Strategy
+
+```python
+# Add caching for production
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+
+@app.on_event("startup")
+async def startup():
+    redis = aioredis.from_url("redis://localhost", encoding="utf8")
+    FastAPICache.init(RedisBackend(redis), prefix="cargo-laytime")
+```
 
 ## 📖 Usage
 
@@ -264,8 +519,11 @@ The frontend will be available at `http://localhost:8080`
 
 #### Document Processing
 - `POST /convert-pdf/` - Upload and process PDF documents
+- `POST /extract` - Extract data from PDF (compatibility endpoint)
+- `POST /api/extract-events` - Extract events and timeline data
 - `GET /health` - Backend health check
-- `GET /docs` - Interactive API documentation
+- `GET /dashboard` - Serve dashboard HTML
+- `GET /extraction-results` - Serve extraction results HTML
 
 #### Response Format
 ```json
@@ -294,7 +552,7 @@ The frontend will be available at `http://localhost:8080`
 
 ### Environment Variables
 
-Create a `.env` file in the `backend/` directory:
+Create a `.env` file in the `backend/` directory (use `env.example` as template):
 
 ```env
 # Google Cloud Configuration
@@ -314,8 +572,8 @@ ALLOWED_ORIGINS=http://localhost:8080,http://127.0.0.1:8080
 ### Google Cloud Setup
 
 1. **Enable APIs** in Google Cloud Console:
-   - Cloud Vision API
    - Document AI API
+   - Cloud Storage API
    - Generative AI API
 
 2. **Create Service Account**:
@@ -414,9 +672,10 @@ We welcome contributions to improve Cargo Laytime!
 cd backend
 python -m pytest
 
-# Frontend tests (if applicable)
-cd docs
-npm test
+# Manual testing
+# Test PDF upload and processing
+# Verify laytime calculations
+# Check frontend-backend integration
 ```
 
 ## 📄 License
