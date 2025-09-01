@@ -520,7 +520,7 @@ async def startup():
 
 ## 🔌 API Endpoints
 
-### Base URL: `http://localhost:8000`
+### Base URL: `https://teamaaam.onrender.com`
 
 #### Document Processing
 - `POST /convert-pdf/` - Upload and process PDF documents
@@ -529,6 +529,13 @@ async def startup():
 - `GET /health` - Backend health check
 - `GET /dashboard` - Serve dashboard HTML
 - `GET /extraction-results` - Serve extraction results HTML
+
+#### Request Format
+
+**File Upload Endpoints** (`/convert-pdf/`, `/extract`):
+- **Content-Type**: `multipart/form-data`
+- **Field Name**: `pdf` (required)
+- **File Type**: PDF only
 
 #### Response Format
 ```json

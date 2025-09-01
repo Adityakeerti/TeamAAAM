@@ -260,7 +260,7 @@ class ExtractionResults {
             this.showLoading('Processing PDF with backend...');
             
             const formData = new FormData();
-            formData.append('pdf_file', pdfFile);
+            formData.append('pdf', pdfFile); // Fixed: Changed from 'pdf_file' to 'pdf'
             
             console.log('Sending PDF to backend:', pdfFile.name);
             

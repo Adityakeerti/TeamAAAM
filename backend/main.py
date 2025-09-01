@@ -172,7 +172,7 @@ async def extract_events_and_timeline():
         )
 
 @app.post("/convert-pdf/")
-async def convert_pdf_to_json(pdf_file: UploadFile = File(...)):
+async def convert_pdf_to_json(pdf_file: UploadFile = File(..., alias="pdf")):
     """
     Convert PDF to JSON using OCR and parsing
     """
