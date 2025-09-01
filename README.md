@@ -210,6 +210,11 @@ The frontend will be available at `http://localhost:8080`
 
 ## ☁️ Hosting & Deployment
 
+**🚀 Current Status: LIVE on Render**
+- **Production URL**: [https://teamaaam.onrender.com](https://teamaaam.onrender.com)
+- **Status**: ✅ Deployed and Running
+- **Last Updated**: December 2024
+
 This project is configured for multiple hosting platforms. Choose the option that best fits your needs:
 
 ### 🚀 Render (Recommended - Free Tier Available)
@@ -257,7 +262,7 @@ PORT=10000
 
 # Security
 SECRET_KEY=your-secret-key-here
-ALLOWED_ORIGINS=https://your-app-name.onrender.com
+ALLOWED_ORIGINS=https://teamaaam.onrender.com
 ```
 
 ### 🎯 Heroku Deployment
