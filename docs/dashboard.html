@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>SoF Event Extractor - Dashboard</title>
     <link rel="stylesheet" href="assets/css/dashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -131,6 +134,13 @@
                     <div class="btn-overlay"></div>
                     <i class="fas fa-magic"></i>
                 </button>
+                
+                <!-- Debug: Connection Test Button -->
+                <button class="extract-btn" id="testConnectionBtn" onclick="testConnection()" style="margin-top: 10px; background-color: #6c757d;">
+                    <span class="btn-text">TEST CONNECTION</span>
+                    <div class="btn-overlay"></div>
+                    <i class="fas fa-wifi"></i>
+                </button>
             </div>
 
             <!-- Progress Section -->
@@ -218,6 +228,68 @@
         </div>
     </div>
 
-    <script src="assets/js/dashboard.js"></script>
+    <script src="assets/js/dashboard.js?v=20241201"></script>
+    <script>
+        // Debug: Check if dashboard.js loaded correctly
+        console.log('Dashboard HTML loaded at:', new Date().toISOString());
+        console.log('Current page URL:', window.location.href);
+        
+        // Check if dashboard object is available
+        window.addEventListener('load', function() {
+            console.log('Page fully loaded at:', new Date().toISOString());
+            if (typeof dashboard !== 'undefined') {
+                console.log('Dashboard object found:', dashboard);
+                console.log('Dashboard baseURL:', dashboard.baseURL);
+            } else {
+                console.error('Dashboard object not found!');
+            }
+        });
+        
+        // Debug: Test connection function
+        async function testConnection() {
+            console.log('Testing connection...');
+            try {
+                const response = await fetch('https://teamaaam.onrender.com/health');
+                console.log('Connection test response:', response.status, response.statusText);
+                if (response.ok) {
+                    const data = await response.json();
+                    alert(`✅ Connection successful!\nStatus: ${data.status}\nBackend: https://teamaaam.onrender.com`);
+                } else {
+                    alert(`❌ Connection failed!\nStatus: ${response.status}\nStatus Text: ${response.statusText}`);
+                }
+            } catch (error) {
+                console.error('Connection test error:', error);
+                alert(`❌ Connection error!\nError: ${error.message}`);
+            }
+        }
+        
+        // Debug: Test dashboard object
+        function testDashboard() {
+            console.log('Testing dashboard object...');
+            if (typeof dashboard !== 'undefined') {
+                console.log('✅ Dashboard object found');
+                console.log('Base URL:', dashboard.baseURL);
+                console.log('Current file:', dashboard.currentFile);
+                alert(`✅ Dashboard object working!\nBase URL: ${dashboard.baseURL}`);
+            } else {
+                console.error('❌ Dashboard object not found');
+                alert('❌ Dashboard object not found!');
+            }
+        }
+        
+        // Add test button to page
+        window.addEventListener('load', function() {
+            const testSection = document.querySelector('.extract-section');
+            if (testSection) {
+                const testBtn = document.createElement('button');
+                testBtn.className = 'extract-btn';
+                testBtn.style.marginTop = '10px';
+                testBtn.style.backgroundColor = '#28a745';
+                testBtn.onclick = testDashboard;
+                testBtn.innerHTML = '<span class="btn-text">TEST DASHBOARD</span><div class="btn-overlay"></div><i class="fas fa-cog"></i>';
+                testSection.appendChild(testBtn);
+            }
+        });
+    </script>
 </body>
 </html>

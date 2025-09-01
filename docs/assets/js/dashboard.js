@@ -1,4 +1,8 @@
 // Dashboard JavaScript with FastAPI Integration
+// Version: 2024-12-01 - Updated for Render deployment
+console.log('Dashboard.js loaded - Version 2024-12-01');
+console.log('Base URL set to: https://teamaaam.onrender.com');
+
 class DashboardAPI {
     constructor() {
         this.baseURL = 'https://teamaaam.onrender.com';
@@ -231,14 +235,21 @@ class DashboardAPI {
         this.showLoading('Uploading document...');
         
         try {
+            console.log('Starting upload with baseURL:', this.baseURL);
+            console.log('Current file:', this.currentFile.name, this.currentFile.size);
+            
             const formData = new FormData();
             // Backend expects field name 'pdf'
             formData.append('pdf', this.currentFile);
 
+            console.log('FormData created, sending to:', `${this.baseURL}/extract`);
+            
             const response = await fetch(`${this.baseURL}/extract`, {
                 method: 'POST',
                 body: formData
             });
+
+            console.log('Response received:', response.status, response.statusText);
 
             if (!response.ok) {
                 const text = await response.text();
@@ -246,6 +257,8 @@ class DashboardAPI {
             }
 
             const result = await response.json();
+            console.log('Upload successful, result:', result);
+            
             // Persist extraction result for results page
             localStorage.setItem('extractionResult', JSON.stringify(result));
 
@@ -256,6 +269,11 @@ class DashboardAPI {
             }, 800);
         } catch (error) {
             console.error('Upload error:', error);
+            console.error('Error details:', {
+                message: error.message,
+                stack: error.stack,
+                baseURL: this.baseURL
+            });
             this.showMessage(`Upload failed: ${error.message}`, 'error');
         } finally {
             this.hideLoading();
