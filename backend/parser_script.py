@@ -126,6 +126,66 @@ def extract_json_from_model_response(raw_text: str) -> Optional[Any]:
         print("Final parsing attempt failed after cleaning. Check 'attempted_clean.json'.")
         return None
 
+# --- Single Page Document Handler ---
+def parse_single_page_sof(input_text: str) -> Optional[Any]:
+    """Handles single-page SOF documents with increased token limits and validation."""
+    schema_description = get_sof_schema_for_prompt()
+    
+    # Count approximate events in the text to determine token needs
+    event_indicators = ['Loading', 'Awaiting', 'Stevedore', 'P.O.B.', 'Passage', 'Arrived', 'First line', 'Accommodation', 'Inward', 'Initial', 'Master']
+    event_count = sum(input_text.count(indicator) for indicator in event_indicators)
+    
+    # Calculate dynamic token limit based on content size
+    base_tokens = 4096
+    additional_tokens = min(event_count * 50, 12288)  # Max 16K tokens
+    max_tokens = base_tokens + additional_tokens
+    
+    prompt = f"""
+    Analyze the following COMPLETE "Statement of Facts" document. This is a SINGLE-PAGE document containing ALL events from start to finish.
+
+    CRITICAL REQUIREMENTS:
+    1. Extract ALL header and vessel information
+    2. Extract EVERY SINGLE EVENT from the entire document - do not miss any events
+    3. Pay special attention to events at the end of the document
+    4. Ensure you capture events through the final completion and departure
+    5. Your response must be ONLY the JSON object, starting with `{{` and ending with `}}`
+
+    JSON Schema to follow:
+    {schema_description}
+
+    --- COMPLETE DOCUMENT TEXT START ---
+    {input_text}
+    --- COMPLETE DOCUMENT TEXT END ---
+
+    IMPORTANT: This document contains approximately {event_count} events. Make sure to capture ALL of them, including the final events at the end.
+
+    JSON Output:
+    """
+
+    print(f"Processing single-page document with ~{event_count} events using {max_tokens} max tokens...")
+    try:
+        model = genai.GenerativeModel('gemini-1.5-flash-latest')
+        generation_config = genai.types.GenerationConfig(max_output_tokens=max_tokens)
+        response = model.generate_content(prompt, generation_config=generation_config)
+        
+        print("Raw response received. Attempting to parse JSON...")
+        parsed_data = extract_json_from_model_response(response.text)
+        
+        # Validation: Check if we captured a reasonable number of events
+        if parsed_data and isinstance(parsed_data, dict):
+            captured_events = len(parsed_data.get('events', []))
+            print(f"Validation: Captured {captured_events} events from estimated {event_count} events")
+            
+            # If we captured significantly fewer events than expected, warn
+            if captured_events < event_count * 0.7:  # Less than 70% of expected events
+                print(f"WARNING: May have missed events. Expected ~{event_count}, captured {captured_events}")
+                print("Consider increasing token limit or splitting document.")
+            
+        return parsed_data
+    except Exception as e:
+        print(f"An error occurred during single-page API processing: {e}")
+        return None
+
 # --- Gemini API Interaction ---
 def parse_sof_chunk(input_text: str, is_first_page: bool) -> Optional[Any]:
     """Sends a chunk of text (one page) to the Gemini API for parsing."""
@@ -210,36 +270,53 @@ def main():
     pages = sof_text.split('--- Page Break ---')
     print(f"Document split into {len(pages)} pages.")
 
-    final_json = {}
-    all_events = []
-
-    for i, page_text in enumerate(pages):
-        if not page_text.strip():
-            continue
+    # Check if this is a single-page document (no page breaks found)
+    is_single_page = len(pages) == 1 and '--- Page Break ---' not in sof_text
+    
+    if is_single_page:
+        print("Detected single-page document. Using specialized single-page parser...")
+        parsed_data = parse_single_page_sof(sof_text)
         
-        print(f"\n--- Processing Page {i + 1} ---")
-        is_first = (i == 0)
-        parsed_data = parse_sof_chunk(page_text, is_first_page=is_first)
-
-        if not parsed_data:
-            print(f"Warning: Failed to parse page {i + 1}. Skipping.")
-            continue
-
-        if is_first and isinstance(parsed_data, dict):
-            final_json['header'] = parsed_data.get('header', {})
-            final_json['vessel_info'] = parsed_data.get('vessel_info', {})
-            page_events = parsed_data.get('events', [])
-            if isinstance(page_events, list):
-                all_events.extend(page_events)
-        elif not is_first and isinstance(parsed_data, list):
-            all_events.extend(parsed_data)
+        if parsed_data and isinstance(parsed_data, dict):
+            final_json = parsed_data
+            all_events = parsed_data.get('events', [])
+            print(f"Single-page parsing completed. Captured {len(all_events)} events.")
         else:
-            print(f"Warning: Parsed data for page {i + 1} has an unexpected format. Skipping.")
+            print("Failed to parse single-page document.")
+            return
+    else:
+        # Multi-page document processing
+        final_json = {}
+        all_events = []
 
-    final_json['events'] = all_events
+        for i, page_text in enumerate(pages):
+            if not page_text.strip():
+                continue
+            
+            print(f"\n--- Processing Page {i + 1} ---")
+            is_first = (i == 0)
+            parsed_data = parse_sof_chunk(page_text, is_first_page=is_first)
+
+            if not parsed_data:
+                print(f"Warning: Failed to parse page {i + 1}. Skipping.")
+                continue
+
+            if is_first and isinstance(parsed_data, dict):
+                final_json['header'] = parsed_data.get('header', {})
+                final_json['vessel_info'] = parsed_data.get('vessel_info', {})
+                page_events = parsed_data.get('events', [])
+                if isinstance(page_events, list):
+                    all_events.extend(page_events)
+            elif not is_first and isinstance(parsed_data, list):
+                all_events.extend(parsed_data)
+            else:
+                print(f"Warning: Parsed data for page {i + 1} has an unexpected format. Skipping.")
+
+        final_json['events'] = all_events
 
     if final_json.get('header') or final_json.get('vessel_info') or final_json.get('events'):
-        print(f"\nSuccessfully parsed {len(all_events)} events across {len(pages)} pages. Writing to '{args.output_file}'...")
+        page_count = 1 if is_single_page else len(pages)
+        print(f"\nSuccessfully parsed {len(all_events)} events across {page_count} page(s). Writing to '{args.output_file}'...")
         with open(args.output_file, "w", encoding="utf-8") as f:
             json.dump(final_json, f, indent=2)
         print("JSON file created successfully.")
